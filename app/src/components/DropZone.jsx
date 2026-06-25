@@ -1,12 +1,20 @@
 import React, { useRef, useState } from "react";
 
-export default function DropZone({ onFiles, status, label = "Drop the raw ICPOES export here", hint }) {
+export default function DropZone({
+  onFiles,
+  status,
+  label = "Drop the raw ICPOES export here",
+  hint,
+  accept = ".xlsx,.xls",
+  match = /\.xlsx?$/i,
+  multiple = true,
+}) {
   const inputRef = useRef(null);
   const [over, setOver] = useState(false);
 
   const pick = (fileList) => {
-    const files = [...fileList].filter((f) => /\.xlsx?$/i.test(f.name));
-    if (files.length) onFiles(files);
+    const files = [...fileList].filter((f) => match.test(f.name));
+    if (files.length) onFiles(multiple ? files : [files[0]]);
   };
 
   return (
@@ -27,8 +35,8 @@ export default function DropZone({ onFiles, status, label = "Drop the raw ICPOES
       <input
         ref={inputRef}
         type="file"
-        accept=".xlsx,.xls"
-        multiple
+        accept={accept}
+        multiple={multiple}
         hidden
         onChange={(e) => pick(e.target.files)}
       />

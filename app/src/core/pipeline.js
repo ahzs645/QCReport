@@ -4,8 +4,10 @@
 // injection into the pristine template XML (exceljs cannot round-trip the dynamic
 // arrays / metadata.xml without corrupting the file).
 
+import JSZip from "jszip";
 import { buildSpec, findHeaderFields, getClientSamples, loadWorkbook } from "../../../scripts/lib/results-workbook.mjs";
 import { parseIcpoesConcWorkbook } from "../../../scripts/lib/raw-parsers/icpoes-conc.mjs";
+import { buildContract, extractEsws, isEswsZip } from "../../../scripts/lib/raw-parsers/icpoes-esws.mjs";
 import { ingestQcBatch, parseQcBatch } from "../../../scripts/lib/qc-batch.mjs";
 import { ingestIcpoes } from "../../../scripts/lib/ingest.mjs";
 import { runQcCheck } from "../../../scripts/lib/qc-engine.mjs";
@@ -38,12 +40,22 @@ function classify(wb) {
  */
 export async function analyze(files) {
   const loaded = [];
+  let rawEsws = null;
   for (const f of files) {
-    const wb = await loadWorkbook(await fileBuffer(f));
+    const buf = await fileBuffer(f);
+    // ICP Expert .esws is a ZIP of .NET-serialized parts, not a workbook —
+    // parse it directly (removes the manual "Export to Excel" step).
+    if (/\.esws$/i.test(f.name)) {
+      const zip = await JSZip.loadAsync(buf);
+      if (isEswsZip(zip)) { rawEsws = { file: f, extract: await extractEsws(zip) }; continue; }
+    }
+    const wb = await loadWorkbook(buf);
     loaded.push({ file: f, wb, kind: classify(wb) });
   }
-  const raw = loaded.find((x) => x.kind === "raw");
-  if (!raw) throw new Error("Drop the raw ICPOES export (a workbook with a Concentration sheet).");
+  const rawWb = loaded.find((x) => x.kind === "raw");
+  if (!rawEsws && !rawWb) {
+    throw new Error("Drop the raw ICPOES export — an ICP Expert .esws worksheet or a Concentration .xlsx.");
+  }
   const resultsDrop = loaded.find((x) => x.kind === "results");
   const qcDrop = loaded.find((x) => x.kind === "qc");
 
@@ -52,14 +64,23 @@ export async function analyze(files) {
   const spec = buildSpec(specWb);
   const oes = spec.instrumentSheets["ICPOES RESULTS"];
 
-  // Parse the raw run (adjusted Concentration + Unadjusted for QC).
-  const conc = parseIcpoesConcWorkbook(raw.wb);
-  let unadj = conc;
-  try {
-    unadj = parseIcpoesConcWorkbook(raw.wb, { kind: "unadjusted" });
-  } catch {
-    /* some exports have only one sheet */
+  // Parse the raw run (adjusted Concentration + Unadjusted for QC). The .esws is
+  // extracted once; the .xlsx Conc workbook is parsed per kind.
+  let conc;
+  let unadj;
+  if (rawEsws) {
+    conc = buildContract(rawEsws.extract, "adjusted");
+    unadj = buildContract(rawEsws.extract, "unadjusted");
+  } else {
+    conc = parseIcpoesConcWorkbook(rawWb.wb);
+    unadj = conc;
+    try {
+      unadj = parseIcpoesConcWorkbook(rawWb.wb, { kind: "unadjusted" });
+    } catch {
+      /* some exports have only one sheet */
+    }
   }
+  const rawName = rawEsws ? rawEsws.file.name : rawWb.file.name;
 
   // Samples: friendly names from a dropped RESULTS, else detected from the raw.
   const samples = resultsDrop ? getClientSamples(resultsDrop.wb, spec) : detectClientSamples(conc);
@@ -76,7 +97,7 @@ export async function analyze(files) {
 
   return {
     sources: {
-      raw: raw.file.name,
+      raw: rawName,
       results: resultsDrop?.file.name || null,
       qc: qcDrop?.file.name || null,
       qcRoleSource: qcDrop ? "dropped QC workbook" : "bundled template (deterministic roles)",

@@ -2,7 +2,47 @@
 // shared by the browser app (preview) and Node (testing). Pure.
 
 import { reportableValue } from "./formula-engine.mjs";
+import { toNumber } from "./sheet-utils.mjs";
 import { normalizeAnalyteLabel, normalizeSampleId } from "./raw-parsers/normalize.mjs";
+
+/**
+ * Compare the adjusted vs unadjusted concentration for each client sample × analyte.
+ * adjusted = unadjusted × the sample's total dilution, so the ratio reveals the
+ * applied dilution (≈1 = none). Returns flat rows for a comparison report.
+ *
+ * @param {object} adjusted   - parseIcpoesConcWorkbook() (Concentration/Raw Data)
+ * @param {object} unadjusted - parseIcpoesConcWorkbook(..., {kind:"unadjusted"})
+ * @param {Array<{name,id}>} samples
+ * @returns {Array<{sample,id,analyte,key,adjusted,unadjusted,diff,ratio}>}
+ */
+export function adjustedVsUnadjusted(adjusted, unadjusted, samples) {
+  const adjById = new Map(adjusted.rows.map((r) => [normalizeSampleId(r.label), r]));
+  const unById = new Map((unadjusted?.rows || []).map((r) => [normalizeSampleId(r.label), r]));
+  const rows = [];
+  for (const s of samples) {
+    const aRow = adjById.get(normalizeSampleId(s.id));
+    if (!aRow) continue;
+    const uRow = unById.get(normalizeSampleId(s.id));
+    for (const a of adjusted.analytes) {
+      const adj = aRow.values[a.key];
+      const unadj = uRow ? uRow.values[a.key] : undefined;
+      const an = toNumber(adj);
+      const un = toNumber(unadj);
+      if (an === null && un === null) continue;
+      rows.push({
+        sample: s.name,
+        id: s.id,
+        analyte: a.rawLabel,
+        key: a.key,
+        adjusted: adj ?? null,
+        unadjusted: unadj ?? null,
+        diff: an !== null && un !== null ? an - un : null,
+        ratio: an !== null && un !== null && un !== 0 ? an / un : null,
+      });
+    }
+  }
+  return rows;
+}
 
 const QC_LABEL = /blank|standard|ccv|icv|ipc|rinse|interference|fortified|low level|no run|^iq/i;
 

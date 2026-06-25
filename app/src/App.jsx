@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import QcResultsView from "./views/QcResultsView.jsx";
 import ControlChartView from "./views/ControlChartView.jsx";
 import PresetsView from "./views/PresetsView.jsx";
+import EwsParserView from "./views/EwsParserView.jsx";
 
 const TABS = [
   { id: "qc", label: "Quality Check & Results" },
   { id: "control", label: "Control Charts" },
+  { id: "ews", label: "EWS Parser" },
   { id: "presets", label: "Presets" },
 ];
 
@@ -43,6 +45,7 @@ export default function App() {
       </nav>
       {tab === "qc" && <QcResultsView />}
       {tab === "control" && <ControlChartView />}
+      {tab === "ews" && <EwsParserView />}
       {tab === "presets" && <PresetsView />}
     </div>
   );

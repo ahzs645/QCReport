@@ -58,6 +58,7 @@ table.cc-table th, table.cc-table td { border-bottom: 1px solid var(--border); p
 table.cc-table th:first-child, table.cc-table td:first-child { text-align: left; }
 table.cc-table thead th { position: sticky; top: 0; background: var(--section); }
 table.cc-table .row-fail { background: var(--fail-bg); }
+table.cc-table .row-diluted { background: #fff6e6; }
 table.cc-table th.sortable { cursor: pointer; user-select: none; }
 table.cc-table th.sortable:hover { background: #e2e8ec; }
 table.cc-table tr.row-selected td { background: #d7efe4 !important; box-shadow: inset 0 0 0 9999px rgba(11,110,79,0.06); }
