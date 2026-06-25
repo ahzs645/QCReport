@@ -1,0 +1,253 @@
+{
+  "analytes": [
+    {
+      "reportableCol": "C",
+      "inputCol": "C",
+      "label": "9  Be  [ 1 ]",
+      "dlRef": "C63",
+      "labelRef": "C64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0002,
+      "detectionLimit": 0.0002,
+      "belowLabel": "<0.0002"
+    },
+    {
+      "reportableCol": "D",
+      "inputCol": "D",
+      "label": "11  B  [ 1 ]",
+      "dlRef": "D63",
+      "labelRef": "D64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.003,
+      "detectionLimit": 0.003,
+      "belowLabel": "<0.003"
+    },
+    {
+      "reportableCol": "E",
+      "inputCol": "E",
+      "label": "51  V  [ 1 ]",
+      "dlRef": "E63",
+      "labelRef": "E64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0003,
+      "detectionLimit": 0.0003,
+      "belowLabel": "<0.0003"
+    },
+    {
+      "reportableCol": "F",
+      "inputCol": "F",
+      "label": "52  Cr  [ 1 ]",
+      "dlRef": "F63",
+      "labelRef": "F64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0001,
+      "detectionLimit": 0.0001,
+      "belowLabel": "<0.0001"
+    },
+    {
+      "reportableCol": "G",
+      "inputCol": "H",
+      "label": "55  Mn  [ 1 ]",
+      "dlRef": "H63",
+      "labelRef": "H64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0001,
+      "detectionLimit": 0.0001,
+      "belowLabel": "<0.0001"
+    },
+    {
+      "reportableCol": "H",
+      "inputCol": "I",
+      "label": "59  Co  [ 1 ]",
+      "dlRef": "I63",
+      "labelRef": "I64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0003,
+      "detectionLimit": 0.0003,
+      "belowLabel": "<0.0003"
+    },
+    {
+      "reportableCol": "I",
+      "inputCol": "J",
+      "label": "60  Ni  [ 1 ]",
+      "dlRef": "J63",
+      "labelRef": "J64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0001,
+      "detectionLimit": 0.0001,
+      "belowLabel": "<0.0001"
+    },
+    {
+      "reportableCol": "J",
+      "inputCol": "K",
+      "label": "63  Cu  [ 1 ]",
+      "dlRef": "K63",
+      "labelRef": "K64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.001,
+      "detectionLimit": 0.001,
+      "belowLabel": "<0.001"
+    },
+    {
+      "reportableCol": "K",
+      "inputCol": "L",
+      "label": "66  Zn  [ 1 ]",
+      "dlRef": "L63",
+      "labelRef": "L64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0004,
+      "detectionLimit": 0.0004,
+      "belowLabel": "<0.0004"
+    },
+    {
+      "reportableCol": "L",
+      "inputCol": "M",
+      "label": "75  As  [ 1 ]",
+      "dlRef": "M63",
+      "labelRef": "M64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0003,
+      "detectionLimit": 0.0003,
+      "belowLabel": "<0.0003"
+    },
+    {
+      "reportableCol": "M",
+      "inputCol": "O",
+      "label": "78  Se  [ 1 ]",
+      "dlRef": "O63",
+      "labelRef": "O64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.001,
+      "detectionLimit": 0.001,
+      "belowLabel": "<0.001"
+    },
+    {
+      "reportableCol": "N",
+      "inputCol": "Q",
+      "label": "95  Mo  [ 1 ]",
+      "dlRef": "Q63",
+      "labelRef": "Q64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.001,
+      "detectionLimit": 0.001,
+      "belowLabel": "<0.001"
+    },
+    {
+      "reportableCol": "O",
+      "inputCol": "U",
+      "label": "111  Cd  [ 1 ]",
+      "dlRef": "U63",
+      "labelRef": "U64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0002,
+      "detectionLimit": 0.0002,
+      "belowLabel": "<0.0002"
+    },
+    {
+      "reportableCol": "P",
+      "inputCol": "V",
+      "label": "121  Sb  [ 1 ]",
+      "dlRef": "V63",
+      "labelRef": "V64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.002,
+      "detectionLimit": 0.002,
+      "belowLabel": "<0.002"
+    },
+    {
+      "reportableCol": "Q",
+      "inputCol": "W",
+      "label": "137  Ba  [ 1 ]",
+      "dlRef": "W63",
+      "labelRef": "W64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0002,
+      "detectionLimit": 0.0002,
+      "belowLabel": "<0.0002"
+    },
+    {
+      "reportableCol": "R",
+      "inputCol": "X",
+      "label": "202  Hg  [ 1 ]",
+      "dlRef": "X63",
+      "labelRef": "X64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.3,
+      "detectionLimit": 0.3,
+      "belowLabel": "<0.3"
+    },
+    {
+      "reportableCol": "S",
+      "inputCol": "Y",
+      "label": "205  Tl  [ 1 ]",
+      "dlRef": "Y63",
+      "labelRef": "Y64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0002,
+      "detectionLimit": 0.0002,
+      "belowLabel": "<0.0002"
+    },
+    {
+      "reportableCol": "T",
+      "inputCol": "AB",
+      "label": "208  Pb  [ 1 ]",
+      "dlRef": "AB63",
+      "labelRef": "AB64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0001,
+      "detectionLimit": 0.0001,
+      "belowLabel": "<0.0001"
+    },
+    {
+      "reportableCol": "U",
+      "inputCol": "AC",
+      "label": "232  Th  [ 1 ]",
+      "dlRef": "AC63",
+      "labelRef": "AC64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0002,
+      "detectionLimit": 0.0002,
+      "belowLabel": "<0.0002"
+    },
+    {
+      "reportableCol": "V",
+      "inputCol": "AD",
+      "label": "238  U  [ 1 ]",
+      "dlRef": "AD63",
+      "labelRef": "AD64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.0002,
+      "detectionLimit": 0.0002,
+      "belowLabel": "<0.0002"
+    }
+  ],
+  "sampleNameCols": {},
+  "inputRows": {
+    "start": 18,
+    "end": 62
+  },
+  "reportableRows": {
+    "start": 69,
+    "end": 113
+  }
+}

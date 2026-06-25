@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Generated output (datasets, re-exports, reports, QA) + build artifacts
+out/
+dist/
+app/dist/
+
+# Raw source data and real lab workbooks — never commit client/lab data
+raw/
+samples/
+*.RW/
+**/ICPOES/
+**/ICPQQQ/
+**/IC/
+
+# OS / editor
+.DS_Store
+*~
+*.tmp
+
+# Excel lock files
+~$*.xlsx
+~$*.xls
+
+# Allow the blank template + spec (no client data) to be committed
+!templates/
+!templates/**

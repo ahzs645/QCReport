@@ -1,0 +1,27 @@
+{
+  "name": "water-report-manager",
+  "version": "0.1.0",
+  "description": "NALS (UNBC) water analysis pipeline: re-export the RESULTS calculation workbook and recreate it from raw instrument exports.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "extract:template": "node scripts/extract-template.mjs",
+    "build:templates": "node scripts/build-templates.mjs",
+    "reexport:workbook": "node scripts/reexport-workbook.mjs",
+    "compute:report": "node scripts/compute-report.mjs",
+    "ingest:raw": "node scripts/ingest-raw.mjs",
+    "analyze:control-chart": "node scripts/analyze-control-chart.mjs",
+    "generate:report": "node scripts/generate-report.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "jszip": "^3.10.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.2"
+  }
+}

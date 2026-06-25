@@ -1,0 +1,23 @@
+{
+  "name": "water-report-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Client-side NALS water QC + RESULTS app (no server). Drop the raw ICPOES export.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "jszip": "^3.10.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.3"
+  }
+}

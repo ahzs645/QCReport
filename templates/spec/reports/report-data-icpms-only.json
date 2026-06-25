@@ -1,0 +1,700 @@
+{
+  "layout": {
+    "nameCol": 2,
+    "unitsCol": 3,
+    "guidelineCol": 4,
+    "sourceCol": 5,
+    "dropdownCol": null
+  },
+  "headers": [
+    {
+      "row": 6,
+      "section": "Physical Tests"
+    },
+    {
+      "row": 12,
+      "section": "Biological Tests"
+    },
+    {
+      "row": 16,
+      "section": "Anion Scan"
+    },
+    {
+      "row": 25,
+      "section": "Total Metals"
+    },
+    {
+      "row": 47,
+      "section": "Additional Parameters"
+    }
+  ],
+  "parameters": [
+    {
+      "row": 7,
+      "section": "Physical Tests",
+      "name": "pH",
+      "units": "",
+      "guideline": "7.0-10.5",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "D18:D62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 4,
+              "row": 18,
+              "colLetter": "D"
+            },
+            "end": {
+              "col": 4,
+              "row": 62,
+              "colLetter": "D"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 8,
+      "section": "Physical Tests",
+      "name": "Electrical Conductivity",
+      "units": "µS/cm",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "E18:E62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 5,
+              "row": 18,
+              "colLetter": "E"
+            },
+            "end": {
+              "col": 5,
+              "row": 62,
+              "colLetter": "E"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 9,
+      "section": "Physical Tests",
+      "name": "Hardness",
+      "units": "mg CaCO3/L",
+      "guideline": "n/a",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "G18:G62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 7,
+              "row": 18,
+              "colLetter": "G"
+            },
+            "end": {
+              "col": 7,
+              "row": 62,
+              "colLetter": "G"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 10,
+      "section": "Physical Tests",
+      "name": "Turbidity",
+      "units": "NTU",
+      "guideline": "1",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "L18:L62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 12,
+              "row": 18,
+              "colLetter": "L"
+            },
+            "end": {
+              "col": 12,
+              "row": 62,
+              "colLetter": "L"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 13,
+      "section": "Biological Tests",
+      "name": "Total Coliforms",
+      "units": "MPN/100mL",
+      "guideline": "0",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "BIOLOGICAL RESULTS",
+          "range": "C18:C62",
+          "parsed": {
+            "sheet": "BIOLOGICAL RESULTS",
+            "start": {
+              "col": 3,
+              "row": 18,
+              "colLetter": "C"
+            },
+            "end": {
+              "col": 3,
+              "row": 62,
+              "colLetter": "C"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 14,
+      "section": "Biological Tests",
+      "name": "E. coli",
+      "units": "MPN/100mL",
+      "guideline": "0",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "BIOLOGICAL RESULTS",
+          "range": "D18:D62",
+          "parsed": {
+            "sheet": "BIOLOGICAL RESULTS",
+            "start": {
+              "col": 4,
+              "row": 18,
+              "colLetter": "D"
+            },
+            "end": {
+              "col": 4,
+              "row": 62,
+              "colLetter": "D"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 17,
+      "section": "Anion Scan",
+      "name": "Fluoride",
+      "units": "mg/L",
+      "guideline": "1.5",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "C69:C113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 3,
+              "row": 69,
+              "colLetter": "C"
+            },
+            "end": {
+              "col": 3,
+              "row": 113,
+              "colLetter": "C"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 18,
+      "section": "Anion Scan",
+      "name": "Chloride",
+      "units": "mg/L",
+      "guideline": "250 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "D69:D113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 4,
+              "row": 69,
+              "colLetter": "D"
+            },
+            "end": {
+              "col": 4,
+              "row": 113,
+              "colLetter": "D"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 19,
+      "section": "Anion Scan",
+      "name": "Nitrite",
+      "units": "mg/L",
+      "guideline": "3",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "E69:E113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 5,
+              "row": 69,
+              "colLetter": "E"
+            },
+            "end": {
+              "col": 5,
+              "row": 113,
+              "colLetter": "E"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 20,
+      "section": "Anion Scan",
+      "name": "Sulphate",
+      "units": "mg/L",
+      "guideline": "500 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "F69:F113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 6,
+              "row": 69,
+              "colLetter": "F"
+            },
+            "end": {
+              "col": 6,
+              "row": 113,
+              "colLetter": "F"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 21,
+      "section": "Anion Scan",
+      "name": "Bromide",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "G69:G113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 7,
+              "row": 69,
+              "colLetter": "G"
+            },
+            "end": {
+              "col": 7,
+              "row": 113,
+              "colLetter": "G"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 22,
+      "section": "Anion Scan",
+      "name": "Nitrate",
+      "units": "mg/L",
+      "guideline": "45",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "H69:H113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 8,
+              "row": 69,
+              "colLetter": "H"
+            },
+            "end": {
+              "col": 8,
+              "row": 113,
+              "colLetter": "H"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 23,
+      "section": "Anion Scan",
+      "name": "Phosphate",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "I69:I113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 9,
+              "row": 69,
+              "colLetter": "I"
+            },
+            "end": {
+              "col": 9,
+              "row": 113,
+              "colLetter": "I"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 26,
+      "section": "Total Metals",
+      "name": "Beryllium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPMS RESULTS",
+          "range": "C69:V113",
+          "parsed": {
+            "sheet": "ICPMS RESULTS",
+            "start": {
+              "col": 3,
+              "row": 69,
+              "colLetter": "C"
+            },
+            "end": {
+              "col": 22,
+              "row": 113,
+              "colLetter": "V"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 48,
+      "section": "Additional Parameters",
+      "name": "Heterotrophic Plate Count",
+      "units": "MPN/1mL",
+      "guideline": "n/a",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "BIOLOGICAL RESULTS",
+          "range": "E18:E62",
+          "parsed": {
+            "sheet": "BIOLOGICAL RESULTS",
+            "start": {
+              "col": 5,
+              "row": 18,
+              "colLetter": "E"
+            },
+            "end": {
+              "col": 5,
+              "row": 62,
+              "colLetter": "E"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 49,
+      "section": "Additional Parameters",
+      "name": "Ammonia-N",
+      "units": "mg/L",
+      "guideline": "n/a",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "F18:F62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 6,
+              "row": 18,
+              "colLetter": "F"
+            },
+            "end": {
+              "col": 6,
+              "row": 62,
+              "colLetter": "F"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 50,
+      "section": "Additional Parameters",
+      "name": "Alkalinity",
+      "units": "mg CaCO3/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "H18:H62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 8,
+              "row": 18,
+              "colLetter": "H"
+            },
+            "end": {
+              "col": 8,
+              "row": 62,
+              "colLetter": "H"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 51,
+      "section": "Additional Parameters",
+      "name": "Langelier Saturation Index",
+      "units": "",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "O18:O62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 15,
+              "row": 18,
+              "colLetter": "O"
+            },
+            "end": {
+              "col": 15,
+              "row": 62,
+              "colLetter": "O"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 52,
+      "section": "Additional Parameters",
+      "name": "TOC",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "M18:M62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 13,
+              "row": 18,
+              "colLetter": "M"
+            },
+            "end": {
+              "col": 13,
+              "row": 62,
+              "colLetter": "M"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 53,
+      "section": "Additional Parameters",
+      "name": "TSS",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "I18:I62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 9,
+              "row": 18,
+              "colLetter": "I"
+            },
+            "end": {
+              "col": 9,
+              "row": 62,
+              "colLetter": "I"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 54,
+      "section": "Additional Parameters",
+      "name": "TDS",
+      "units": "mg/L",
+      "guideline": "500 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "J18:J62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 10,
+              "row": 18,
+              "colLetter": "J"
+            },
+            "end": {
+              "col": 10,
+              "row": 62,
+              "colLetter": "J"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 55,
+      "section": "Additional Parameters",
+      "name": "Color",
+      "units": "TCU",
+      "guideline": "15 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "K18:K62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 11,
+              "row": 18,
+              "colLetter": "K"
+            },
+            "end": {
+              "col": 11,
+              "row": 62,
+              "colLetter": "K"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 56,
+      "section": "Additional Parameters",
+      "name": "Odor",
+      "units": "Threshold",
+      "guideline": "Inoffensive",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "P18:P62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 16,
+              "row": 18,
+              "colLetter": "P"
+            },
+            "end": {
+              "col": 16,
+              "row": 62,
+              "colLetter": "P"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

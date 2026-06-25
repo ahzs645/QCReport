@@ -1,0 +1,2208 @@
+{
+  "layout": {
+    "nameCol": 2,
+    "unitsCol": 3,
+    "guidelineCol": 4,
+    "sourceCol": 5,
+    "dropdownCol": null
+  },
+  "headers": [
+    {
+      "row": 6,
+      "section": "Physical Tests"
+    },
+    {
+      "row": 12,
+      "section": "Biological Tests"
+    },
+    {
+      "row": 16,
+      "section": "Anion Scan"
+    },
+    {
+      "row": 25,
+      "section": "Total Metals"
+    },
+    {
+      "row": 80,
+      "section": "Additional Parameters"
+    }
+  ],
+  "parameters": [
+    {
+      "row": 7,
+      "section": "Physical Tests",
+      "name": "pH",
+      "units": "",
+      "guideline": "7.0-10.5",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "D18:D62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 4,
+              "row": 18,
+              "colLetter": "D"
+            },
+            "end": {
+              "col": 4,
+              "row": 62,
+              "colLetter": "D"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 8,
+      "section": "Physical Tests",
+      "name": "Electrical Conductivity",
+      "units": "µS/cm",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "E18:E62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 5,
+              "row": 18,
+              "colLetter": "E"
+            },
+            "end": {
+              "col": 5,
+              "row": 62,
+              "colLetter": "E"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 9,
+      "section": "Physical Tests",
+      "name": "Hardness",
+      "units": "mg CaCO3/L",
+      "guideline": "n/a",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "G18:G62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 7,
+              "row": 18,
+              "colLetter": "G"
+            },
+            "end": {
+              "col": 7,
+              "row": 62,
+              "colLetter": "G"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 10,
+      "section": "Physical Tests",
+      "name": "Turbidity",
+      "units": "NTU",
+      "guideline": "1",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "L18:L62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 12,
+              "row": 18,
+              "colLetter": "L"
+            },
+            "end": {
+              "col": 12,
+              "row": 62,
+              "colLetter": "L"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 13,
+      "section": "Biological Tests",
+      "name": "Total Coliforms",
+      "units": "MPN/100mL",
+      "guideline": "0",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "BIOLOGICAL RESULTS",
+          "range": "C18:C62",
+          "parsed": {
+            "sheet": "BIOLOGICAL RESULTS",
+            "start": {
+              "col": 3,
+              "row": 18,
+              "colLetter": "C"
+            },
+            "end": {
+              "col": 3,
+              "row": 62,
+              "colLetter": "C"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 14,
+      "section": "Biological Tests",
+      "name": "E. coli",
+      "units": "MPN/100mL",
+      "guideline": "0",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "BIOLOGICAL RESULTS",
+          "range": "D18:D62",
+          "parsed": {
+            "sheet": "BIOLOGICAL RESULTS",
+            "start": {
+              "col": 4,
+              "row": 18,
+              "colLetter": "D"
+            },
+            "end": {
+              "col": 4,
+              "row": 62,
+              "colLetter": "D"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 17,
+      "section": "Anion Scan",
+      "name": "Fluoride",
+      "units": "mg/L",
+      "guideline": "1.5",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "C69:C113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 3,
+              "row": 69,
+              "colLetter": "C"
+            },
+            "end": {
+              "col": 3,
+              "row": 113,
+              "colLetter": "C"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 18,
+      "section": "Anion Scan",
+      "name": "Chloride",
+      "units": "mg/L",
+      "guideline": "250 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "D69:D113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 4,
+              "row": 69,
+              "colLetter": "D"
+            },
+            "end": {
+              "col": 4,
+              "row": 113,
+              "colLetter": "D"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 19,
+      "section": "Anion Scan",
+      "name": "Nitrite",
+      "units": "mg/L",
+      "guideline": "3",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "E69:E113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 5,
+              "row": 69,
+              "colLetter": "E"
+            },
+            "end": {
+              "col": 5,
+              "row": 113,
+              "colLetter": "E"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 20,
+      "section": "Anion Scan",
+      "name": "Sulphate",
+      "units": "mg/L",
+      "guideline": "500 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "F69:F113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 6,
+              "row": 69,
+              "colLetter": "F"
+            },
+            "end": {
+              "col": 6,
+              "row": 113,
+              "colLetter": "F"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 21,
+      "section": "Anion Scan",
+      "name": "Bromide",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "G69:G113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 7,
+              "row": 69,
+              "colLetter": "G"
+            },
+            "end": {
+              "col": 7,
+              "row": 113,
+              "colLetter": "G"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 22,
+      "section": "Anion Scan",
+      "name": "Nitrate",
+      "units": "mg/L",
+      "guideline": "45",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "H69:H113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 8,
+              "row": 69,
+              "colLetter": "H"
+            },
+            "end": {
+              "col": 8,
+              "row": 113,
+              "colLetter": "H"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 23,
+      "section": "Anion Scan",
+      "name": "Phosphate",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "IC RESULTS",
+          "range": "I69:I113",
+          "parsed": {
+            "sheet": "IC RESULTS",
+            "start": {
+              "col": 9,
+              "row": 69,
+              "colLetter": "I"
+            },
+            "end": {
+              "col": 9,
+              "row": 113,
+              "colLetter": "I"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 26,
+      "section": "Total Metals",
+      "name": "Silver",
+      "units": "mg/L",
+      "guideline": "n/a",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "C70:C114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 3,
+              "row": 70,
+              "colLetter": "C"
+            },
+            "end": {
+              "col": 3,
+              "row": 114,
+              "colLetter": "C"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 27,
+      "section": "Total Metals",
+      "name": "Aluminum",
+      "units": "mg/L",
+      "guideline": "2.9 (MAC) ; 0.1 (OG)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "E70:E114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 5,
+              "row": 70,
+              "colLetter": "E"
+            },
+            "end": {
+              "col": 5,
+              "row": 114,
+              "colLetter": "E"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 28,
+      "section": "Total Metals",
+      "name": "Arsenic",
+      "units": "mg/L",
+      "guideline": "0.01 ALARA",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "F70:F114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 6,
+              "row": 70,
+              "colLetter": "F"
+            },
+            "end": {
+              "col": 6,
+              "row": 114,
+              "colLetter": "F"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 29,
+      "section": "Total Metals",
+      "name": "Boron",
+      "units": "mg/L",
+      "guideline": "5",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "I70:I114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 9,
+              "row": 70,
+              "colLetter": "I"
+            },
+            "end": {
+              "col": 9,
+              "row": 114,
+              "colLetter": "I"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 30,
+      "section": "Total Metals",
+      "name": "Barium",
+      "units": "mg/L",
+      "guideline": "2",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "K70:K114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 11,
+              "row": 70,
+              "colLetter": "K"
+            },
+            "end": {
+              "col": 11,
+              "row": 114,
+              "colLetter": "K"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 31,
+      "section": "Total Metals",
+      "name": "Beryllium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "M70:M114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 13,
+              "row": 70,
+              "colLetter": "M"
+            },
+            "end": {
+              "col": 13,
+              "row": 114,
+              "colLetter": "M"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 32,
+      "section": "Total Metals",
+      "name": "Calcium",
+      "units": "mg/L",
+      "guideline": "n/a",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "P70:P114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 16,
+              "row": 70,
+              "colLetter": "P"
+            },
+            "end": {
+              "col": 16,
+              "row": 114,
+              "colLetter": "P"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 33,
+      "section": "Total Metals",
+      "name": "Cadmium",
+      "units": "mg/L",
+      "guideline": "0.007",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "R70:R114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 18,
+              "row": 70,
+              "colLetter": "R"
+            },
+            "end": {
+              "col": 18,
+              "row": 114,
+              "colLetter": "R"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 34,
+      "section": "Total Metals",
+      "name": "Cerium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "T70:T114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 20,
+              "row": 70,
+              "colLetter": "T"
+            },
+            "end": {
+              "col": 20,
+              "row": 114,
+              "colLetter": "T"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 35,
+      "section": "Total Metals",
+      "name": "Cobalt",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "V70:V114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 22,
+              "row": 70,
+              "colLetter": "V"
+            },
+            "end": {
+              "col": 22,
+              "row": 114,
+              "colLetter": "V"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 36,
+      "section": "Total Metals",
+      "name": "Chromium",
+      "units": "mg/L",
+      "guideline": "0.05",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "Y70:Y114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 25,
+              "row": 70,
+              "colLetter": "Y"
+            },
+            "end": {
+              "col": 25,
+              "row": 114,
+              "colLetter": "Y"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 37,
+      "section": "Total Metals",
+      "name": "Copper",
+      "units": "mg/L",
+      "guideline": "2 (MAC) ; 1 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "Z70:Z114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 26,
+              "row": 70,
+              "colLetter": "Z"
+            },
+            "end": {
+              "col": 26,
+              "row": 114,
+              "colLetter": "Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 38,
+      "section": "Total Metals",
+      "name": "Dysprosium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AB70:AB114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 28,
+              "row": 70,
+              "colLetter": "AB"
+            },
+            "end": {
+              "col": 28,
+              "row": 114,
+              "colLetter": "AB"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 39,
+      "section": "Total Metals",
+      "name": "Erbium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AD70:AD114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 30,
+              "row": 70,
+              "colLetter": "AD"
+            },
+            "end": {
+              "col": 30,
+              "row": 114,
+              "colLetter": "AD"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 40,
+      "section": "Total Metals",
+      "name": "Europium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AF70:AF114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 32,
+              "row": 70,
+              "colLetter": "AF"
+            },
+            "end": {
+              "col": 32,
+              "row": 114,
+              "colLetter": "AF"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 41,
+      "section": "Total Metals",
+      "name": "Iron",
+      "units": "mg/L",
+      "guideline": "0.1 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AH70:AH114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 34,
+              "row": 70,
+              "colLetter": "AH"
+            },
+            "end": {
+              "col": 34,
+              "row": 114,
+              "colLetter": "AH"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 42,
+      "section": "Total Metals",
+      "name": "Gallium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AI70:AI114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 35,
+              "row": 70,
+              "colLetter": "AI"
+            },
+            "end": {
+              "col": 35,
+              "row": 114,
+              "colLetter": "AI"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 43,
+      "section": "Total Metals",
+      "name": "Gadolinium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AL70:AL114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 38,
+              "row": 70,
+              "colLetter": "AL"
+            },
+            "end": {
+              "col": 38,
+              "row": 114,
+              "colLetter": "AL"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 44,
+      "section": "Total Metals",
+      "name": "Hafnium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AN70:AN114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 40,
+              "row": 70,
+              "colLetter": "AN"
+            },
+            "end": {
+              "col": 40,
+              "row": 114,
+              "colLetter": "AN"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 45,
+      "section": "Total Metals",
+      "name": "Mercury",
+      "units": "µg/L",
+      "guideline": "1",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AP70:AP114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 42,
+              "row": 70,
+              "colLetter": "AP"
+            },
+            "end": {
+              "col": 42,
+              "row": 114,
+              "colLetter": "AP"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 46,
+      "section": "Total Metals",
+      "name": "Holmium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AR70:AR114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 44,
+              "row": 70,
+              "colLetter": "AR"
+            },
+            "end": {
+              "col": 44,
+              "row": 114,
+              "colLetter": "AR"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 47,
+      "section": "Total Metals",
+      "name": "Potassium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AS70:AS114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 45,
+              "row": 70,
+              "colLetter": "AS"
+            },
+            "end": {
+              "col": 45,
+              "row": 114,
+              "colLetter": "AS"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 48,
+      "section": "Total Metals",
+      "name": "Lanthanum",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AT70:AT114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 46,
+              "row": 70,
+              "colLetter": "AT"
+            },
+            "end": {
+              "col": 46,
+              "row": 114,
+              "colLetter": "AT"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 49,
+      "section": "Total Metals",
+      "name": "Lutetium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AX70:AX114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 50,
+              "row": 70,
+              "colLetter": "AX"
+            },
+            "end": {
+              "col": 50,
+              "row": 114,
+              "colLetter": "AX"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 50,
+      "section": "Total Metals",
+      "name": "Magnesium",
+      "units": "mg/L",
+      "guideline": "n/a",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "AZ70:AZ114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 52,
+              "row": 70,
+              "colLetter": "AZ"
+            },
+            "end": {
+              "col": 52,
+              "row": 114,
+              "colLetter": "AZ"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 51,
+      "section": "Total Metals",
+      "name": "Manganese",
+      "units": "mg/L",
+      "guideline": "0.12 (MAC); 0.02 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BB70:BB114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 54,
+              "row": 70,
+              "colLetter": "BB"
+            },
+            "end": {
+              "col": 54,
+              "row": 114,
+              "colLetter": "BB"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 52,
+      "section": "Total Metals",
+      "name": "Molybdenum",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BD70:BD114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 56,
+              "row": 70,
+              "colLetter": "BD"
+            },
+            "end": {
+              "col": 56,
+              "row": 114,
+              "colLetter": "BD"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 53,
+      "section": "Total Metals",
+      "name": "Sodium",
+      "units": "mg/L",
+      "guideline": "200 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BG70:BG114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 59,
+              "row": 70,
+              "colLetter": "BG"
+            },
+            "end": {
+              "col": 59,
+              "row": 114,
+              "colLetter": "BG"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 54,
+      "section": "Total Metals",
+      "name": "Niobium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BI70:BI114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 61,
+              "row": 70,
+              "colLetter": "BI"
+            },
+            "end": {
+              "col": 61,
+              "row": 114,
+              "colLetter": "BI"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 55,
+      "section": "Total Metals",
+      "name": "Neodymium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BJ70:BJ114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 62,
+              "row": 70,
+              "colLetter": "BJ"
+            },
+            "end": {
+              "col": 62,
+              "row": 114,
+              "colLetter": "BJ"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 56,
+      "section": "Total Metals",
+      "name": "Nickel",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BM70:BM114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 65,
+              "row": 70,
+              "colLetter": "BM"
+            },
+            "end": {
+              "col": 65,
+              "row": 114,
+              "colLetter": "BM"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 57,
+      "section": "Total Metals",
+      "name": "Phosphorus",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BP70:BP114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 68,
+              "row": 70,
+              "colLetter": "BP"
+            },
+            "end": {
+              "col": 68,
+              "row": 114,
+              "colLetter": "BP"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 58,
+      "section": "Total Metals",
+      "name": "Lead",
+      "units": "mg/L",
+      "guideline": "0.005 ALARA",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BQ70:BQ114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 69,
+              "row": 70,
+              "colLetter": "BQ"
+            },
+            "end": {
+              "col": 69,
+              "row": 114,
+              "colLetter": "BQ"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 59,
+      "section": "Total Metals",
+      "name": "Rubidium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BR70:BR114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 70,
+              "row": 70,
+              "colLetter": "BR"
+            },
+            "end": {
+              "col": 70,
+              "row": 114,
+              "colLetter": "BR"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 60,
+      "section": "Total Metals",
+      "name": "Sulfur",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BT70:BT114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 72,
+              "row": 70,
+              "colLetter": "BT"
+            },
+            "end": {
+              "col": 72,
+              "row": 114,
+              "colLetter": "BT"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 61,
+      "section": "Total Metals",
+      "name": "Antimony",
+      "units": "mg/L",
+      "guideline": "0.006",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BU70:BU114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 73,
+              "row": 70,
+              "colLetter": "BU"
+            },
+            "end": {
+              "col": 73,
+              "row": 114,
+              "colLetter": "BU"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 62,
+      "section": "Total Metals",
+      "name": "Selenium",
+      "units": "mg/L",
+      "guideline": "0.05",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "BY70:BY114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 77,
+              "row": 70,
+              "colLetter": "BY"
+            },
+            "end": {
+              "col": 77,
+              "row": 114,
+              "colLetter": "BY"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 63,
+      "section": "Total Metals",
+      "name": "Silicon",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CA70:CA114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 79,
+              "row": 70,
+              "colLetter": "CA"
+            },
+            "end": {
+              "col": 79,
+              "row": 114,
+              "colLetter": "CA"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 64,
+      "section": "Total Metals",
+      "name": "Samarium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CC70:CC114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 81,
+              "row": 70,
+              "colLetter": "CC"
+            },
+            "end": {
+              "col": 81,
+              "row": 114,
+              "colLetter": "CC"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 65,
+      "section": "Total Metals",
+      "name": "Tin",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CE70:CE114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 83,
+              "row": 70,
+              "colLetter": "CE"
+            },
+            "end": {
+              "col": 83,
+              "row": 114,
+              "colLetter": "CE"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 66,
+      "section": "Total Metals",
+      "name": "Strontium",
+      "units": "mg/L",
+      "guideline": "7",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CG70:CG114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 85,
+              "row": 70,
+              "colLetter": "CG"
+            },
+            "end": {
+              "col": 85,
+              "row": 114,
+              "colLetter": "CG"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 67,
+      "section": "Total Metals",
+      "name": "Tantalum",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CJ70:CJ114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 88,
+              "row": 70,
+              "colLetter": "CJ"
+            },
+            "end": {
+              "col": 88,
+              "row": 114,
+              "colLetter": "CJ"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 68,
+      "section": "Total Metals",
+      "name": "Tellurium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CL70:CL114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 90,
+              "row": 70,
+              "colLetter": "CL"
+            },
+            "end": {
+              "col": 90,
+              "row": 114,
+              "colLetter": "CL"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 69,
+      "section": "Total Metals",
+      "name": "Thorium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CN70:CN114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 92,
+              "row": 70,
+              "colLetter": "CN"
+            },
+            "end": {
+              "col": 92,
+              "row": 114,
+              "colLetter": "CN"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 70,
+      "section": "Total Metals",
+      "name": "Titanium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CO70:CO114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 93,
+              "row": 70,
+              "colLetter": "CO"
+            },
+            "end": {
+              "col": 93,
+              "row": 114,
+              "colLetter": "CO"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 71,
+      "section": "Total Metals",
+      "name": "Thallium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CQ70:CQ114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 95,
+              "row": 70,
+              "colLetter": "CQ"
+            },
+            "end": {
+              "col": 95,
+              "row": 114,
+              "colLetter": "CQ"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 72,
+      "section": "Total Metals",
+      "name": "Thulium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CT70:CT114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 98,
+              "row": 70,
+              "colLetter": "CT"
+            },
+            "end": {
+              "col": 98,
+              "row": 114,
+              "colLetter": "CT"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 73,
+      "section": "Total Metals",
+      "name": "Uranium",
+      "units": "mg/L",
+      "guideline": "0.02",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CW70:CW114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 101,
+              "row": 70,
+              "colLetter": "CW"
+            },
+            "end": {
+              "col": 101,
+              "row": 114,
+              "colLetter": "CW"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 74,
+      "section": "Total Metals",
+      "name": "Vanadium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CX70:CX114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 102,
+              "row": 70,
+              "colLetter": "CX"
+            },
+            "end": {
+              "col": 102,
+              "row": 114,
+              "colLetter": "CX"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 75,
+      "section": "Total Metals",
+      "name": "Tungsten",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "CZ70:CZ114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 104,
+              "row": 70,
+              "colLetter": "CZ"
+            },
+            "end": {
+              "col": 104,
+              "row": 114,
+              "colLetter": "CZ"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 76,
+      "section": "Total Metals",
+      "name": "Ytterbium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "DD70:DD114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 108,
+              "row": 70,
+              "colLetter": "DD"
+            },
+            "end": {
+              "col": 108,
+              "row": 114,
+              "colLetter": "DD"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 77,
+      "section": "Total Metals",
+      "name": "Zinc",
+      "units": "mg/L",
+      "guideline": "5 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "DG70:DG114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 111,
+              "row": 70,
+              "colLetter": "DG"
+            },
+            "end": {
+              "col": 111,
+              "row": 114,
+              "colLetter": "DG"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 78,
+      "section": "Total Metals",
+      "name": "Zirconium",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "ICPOES RESULTS",
+          "range": "DI70:DI114",
+          "parsed": {
+            "sheet": "ICPOES RESULTS",
+            "start": {
+              "col": 113,
+              "row": 70,
+              "colLetter": "DI"
+            },
+            "end": {
+              "col": 113,
+              "row": 114,
+              "colLetter": "DI"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 81,
+      "section": "Additional Parameters",
+      "name": "Heterotrophic Plate Count",
+      "units": "MPN/1mL",
+      "guideline": "n/a",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "BIOLOGICAL RESULTS",
+          "range": "E18:E62",
+          "parsed": {
+            "sheet": "BIOLOGICAL RESULTS",
+            "start": {
+              "col": 5,
+              "row": 18,
+              "colLetter": "E"
+            },
+            "end": {
+              "col": 5,
+              "row": 62,
+              "colLetter": "E"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 82,
+      "section": "Additional Parameters",
+      "name": "Ammonia-N",
+      "units": "mg/L",
+      "guideline": "n/a",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "F18:F62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 6,
+              "row": 18,
+              "colLetter": "F"
+            },
+            "end": {
+              "col": 6,
+              "row": 62,
+              "colLetter": "F"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 83,
+      "section": "Additional Parameters",
+      "name": "Alkalinity",
+      "units": "mg CaCO3/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "H18:H62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 8,
+              "row": 18,
+              "colLetter": "H"
+            },
+            "end": {
+              "col": 8,
+              "row": 62,
+              "colLetter": "H"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 84,
+      "section": "Additional Parameters",
+      "name": "Langelier Saturation Index",
+      "units": "",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "O18:O62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 15,
+              "row": 18,
+              "colLetter": "O"
+            },
+            "end": {
+              "col": 15,
+              "row": 62,
+              "colLetter": "O"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 85,
+      "section": "Additional Parameters",
+      "name": "TOC",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "M18:M62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 13,
+              "row": 18,
+              "colLetter": "M"
+            },
+            "end": {
+              "col": 13,
+              "row": 62,
+              "colLetter": "M"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 86,
+      "section": "Additional Parameters",
+      "name": "TSS",
+      "units": "mg/L",
+      "guideline": "-",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "I18:I62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 9,
+              "row": 18,
+              "colLetter": "I"
+            },
+            "end": {
+              "col": 9,
+              "row": 62,
+              "colLetter": "I"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 87,
+      "section": "Additional Parameters",
+      "name": "TDS",
+      "units": "mg/L",
+      "guideline": "500 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "J18:J62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 10,
+              "row": 18,
+              "colLetter": "J"
+            },
+            "end": {
+              "col": 10,
+              "row": 62,
+              "colLetter": "J"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 88,
+      "section": "Additional Parameters",
+      "name": "Color",
+      "units": "TCU",
+      "guideline": "15 (AO)",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "K18:K62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 11,
+              "row": 18,
+              "colLetter": "K"
+            },
+            "end": {
+              "col": 11,
+              "row": 62,
+              "colLetter": "K"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "row": 89,
+      "section": "Additional Parameters",
+      "name": "Odor",
+      "units": "Threshold",
+      "guideline": "Inoffensive",
+      "dropdownRef": null,
+      "dropdownValue": null,
+      "sources": [
+        {
+          "when": null,
+          "sheet": "PHYSICAL RESULTS",
+          "range": "P18:P62",
+          "parsed": {
+            "sheet": "PHYSICAL RESULTS",
+            "start": {
+              "col": 16,
+              "row": 18,
+              "colLetter": "P"
+            },
+            "end": {
+              "col": 16,
+              "row": 62,
+              "colLetter": "P"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "version": "NALS_WATERPACKAGEDATA_XL_20250922_REV14",
+  "generatedFrom": "2025NALS02598_2604_2606_2608_RESULTS_WTR_Jan_27_2026_OES.xlsx",
+  "sheets": [
+    {
+      "name": "ICPOES RESULTS",
+      "role": "instrument"
+    },
+    {
+      "name": "ICPMS RESULTS",
+      "role": "instrument"
+    },
+    {
+      "name": "ICPQQQ RESULTS",
+      "role": "instrument"
+    },
+    {
+      "name": "IC RESULTS",
+      "role": "instrument"
+    },
+    {
+      "name": "PHYSICAL RESULTS",
+      "role": "direct"
+    },
+    {
+      "name": "BIOLOGICAL RESULTS",
+      "role": "direct"
+    },
+    {
+      "name": "REPORT DATA (NO Hg)",
+      "role": "report"
+    },
+    {
+      "name": "REPORT DATA",
+      "role": "report"
+    },
+    {
+      "name": "REPORT DATA ICPOES ONLY",
+      "role": "report"
+    },
+    {
+      "name": "REPORT DATA ICPMS ONLY",
+      "role": "report"
+    },
+    {
+      "name": "REPORT DATA ICPQQQ ONLY",
+      "role": "report"
+    },
+    {
+      "name": "INSTRUCTIONS",
+      "role": "lookup"
+    },
+    {
+      "name": "CODES",
+      "role": "lookup"
+    },
+    {
+      "name": "TRACKED CHANGES",
+      "role": "lookup"
+    }
+  ],
+  "primaryReportSheet": "REPORT DATA",
+  "parts": {
+    "instruments": {
+      "ICPOES RESULTS": "instruments/icpoes-results.json",
+      "ICPMS RESULTS": "instruments/icpms-results.json",
+      "ICPQQQ RESULTS": "instruments/icpqqq-results.json",
+      "IC RESULTS": "instruments/ic-results.json"
+    },
+    "reports": {
+      "REPORT DATA (NO Hg)": "reports/report-data-no-hg.json",
+      "REPORT DATA": "reports/report-data.json",
+      "REPORT DATA ICPOES ONLY": "reports/report-data-icpoes-only.json",
+      "REPORT DATA ICPMS ONLY": "reports/report-data-icpms-only.json",
+      "REPORT DATA ICPQQQ ONLY": "reports/report-data-icpqqq-only.json"
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "analytes": [
+    {
+      "reportableCol": "C",
+      "inputCol": "C",
+      "label": "Fluoride",
+      "dlRef": "C63",
+      "labelRef": "C64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.1,
+      "detectionLimit": 0.1,
+      "belowLabel": "<0.1"
+    },
+    {
+      "reportableCol": "D",
+      "inputCol": "D",
+      "label": "Chloride",
+      "dlRef": "D63",
+      "labelRef": "D64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.1,
+      "detectionLimit": 0.1,
+      "belowLabel": "<0.1"
+    },
+    {
+      "reportableCol": "E",
+      "inputCol": "E",
+      "label": "Nitrite",
+      "dlRef": "E63",
+      "labelRef": "E64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.1,
+      "detectionLimit": 0.1,
+      "belowLabel": "<0.1"
+    },
+    {
+      "reportableCol": "F",
+      "inputCol": "F",
+      "label": "Sulphate",
+      "dlRef": "F63",
+      "labelRef": "F64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.1,
+      "detectionLimit": 0.1,
+      "belowLabel": "<0.1"
+    },
+    {
+      "reportableCol": "G",
+      "inputCol": "G",
+      "label": "Bromide",
+      "dlRef": "G63",
+      "labelRef": "G64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.1,
+      "detectionLimit": 0.1,
+      "belowLabel": "<0.1"
+    },
+    {
+      "reportableCol": "H",
+      "inputCol": "H",
+      "label": "Nitrate",
+      "dlRef": "H63",
+      "labelRef": "H64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.1,
+      "detectionLimit": 0.1,
+      "belowLabel": "<0.1"
+    },
+    {
+      "reportableCol": "I",
+      "inputCol": "I",
+      "label": "Phosphate",
+      "dlRef": "I63",
+      "labelRef": "I64",
+      "checksUncal": false,
+      "checksOver": false,
+      "detectionLimitRaw": 0.3,
+      "detectionLimit": 0.3,
+      "belowLabel": "<0.3"
+    }
+  ],
+  "sampleNameCols": {},
+  "inputRows": {
+    "start": 18,
+    "end": 62
+  },
+  "reportableRows": {
+    "start": 69,
+    "end": 113
+  }
+}
