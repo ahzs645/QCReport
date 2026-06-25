@@ -9,6 +9,17 @@
 
 import { normalizeSampleId } from "./raw-parsers/normalize.mjs";
 
+// How raw instrument rows are matched to workbook columns/samples (rendered in app).
+export const MATCH_INFO = Object.freeze({
+  analyte: 'by element + wavelength label with units stripped (e.g. "Al 396.152 nm")',
+  sampleStrategies: [
+    { reason: "exact_id", description: "exact NALS id, e.g. “2026NALS02598 A06” (ICPOES/ICPQQQ labels)" },
+    { reason: "number_and_name", description: "NALS number + exact descriptive name (IC-style labels)" },
+    { reason: "number_and_name_partial", description: "NALS number + partial name match" },
+  ],
+  dilution: '“Dil. 10X” / “Dil. 100X” → dilution factor 10 / 100',
+});
+
 const NALS_NUMBER = /(\d{4}\s*nals\s*\d+)/i;
 
 /** "2026NALS02604" from any label/id (whitespace-normalised, lowercased). */

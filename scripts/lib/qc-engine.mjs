@@ -50,9 +50,33 @@ const ROLE_KEYS = [
   [/Instrument ICV/i, "icv"],
 ];
 
+// What each check kind computes (rendered in the app; co-located with the math).
+export const QC_KINDS = Object.freeze({
+  blank: { label: "Blank", formula: "PASS if the blank's reportable equals its “<DL” label (reads below the reporting limit)" },
+  recovery: { label: "Recovery", formula: "measured ÷ trueValue × 100" },
+  correctedRecovery: { label: "Blank-corrected recovery", formula: "(measured − reference blank) ÷ trueValue × 100" },
+  rpd: { label: "RPD (duplicate)", formula: "|R₁ − R₂| ÷ ((R₁ + R₂) / 2) × 100   (both <RL → PASS)" },
+});
+
+// Human labels for the canonical QC role keys (the one allowed "matching map").
+export const QC_ROLE_LABELS = Object.freeze({
+  ipcBlank: "IPC Blank (after calibration)",
+  ccvCalib: "CCV after calibration",
+  ccvBatch: "CCV after batch",
+  lrb: "Digest Method Blank (LRB)",
+  digestLfb: "Digest LFB",
+  instLfb: "Instrument LFB",
+  interference: "Instrument Interference Check",
+  icv: "Instrument ICV",
+  duplicate: "Sample / Duplicate (RPD)",
+  lfmSpike: "LFM Spike",
+  sample: "Sample (RPD reference)",
+  lfmBackground: "LFM Background (reference)",
+});
+
 // Per-key check definition. Keys without an entry (sample, lfmBackground) are
 // reference rows used by other checks, not checks themselves.
-const CHECKS = {
+export const QC_CHECKS = {
   ipcBlank: { kind: "blank" },
   lrb: { kind: "blank" },
   ccvCalib: { kind: "recovery", trueKey: "ccv", range: "ccv" },
@@ -149,7 +173,7 @@ export function runQcCheck(qcModel, rawUnadjusted, criteria = DEFAULT_QC_CRITERI
   const checks = [];
   let pass = 0;
   let fail = 0;
-  for (const [key, def] of Object.entries(CHECKS)) {
+  for (const [key, def] of Object.entries(QC_CHECKS)) {
     const measured = measuredByKey.get(key);
     if (!measured) continue;
     const meta = rowMeta.get(key);

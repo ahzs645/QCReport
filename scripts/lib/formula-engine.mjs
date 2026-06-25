@@ -18,6 +18,16 @@
 
 import { toNumber } from "./sheet-utils.mjs";
 
+// Declarative description of the per-cell reportable decision tree below (kept
+// here, beside reportableValue(), so it renders in the app without duplication).
+export const REPORTABLE_RULES = Object.freeze([
+  { when: "input is blank", result: "NO DATA" },
+  { when: 'input contains the "Uncal" flag', result: "Uncal", note: "ICPOES sheet only" },
+  { when: 'input contains "o" or "####"', result: "over-range", note: "ICPOES sheet only" },
+  { when: "value < detection limit (per-analyte, row 63) or non-numeric", result: "the “<DL” label (row 64)" },
+  { when: "otherwise", result: "the measured value, unchanged" },
+]);
+
 // Flag codes live on the CODES sheet (A10..A13); defaults match REV14.
 export const DEFAULT_FLAGS = Object.freeze({
   uncal: "Uncal", // CODES!A12
@@ -73,16 +83,18 @@ export function reportableValue(input, { detectionLimit, belowLabel, flags = DEF
   return num;
 }
 
+// Hardness coefficients (mg CaCO3/L per mg/L of Ca / Mg), verified vs the workbook.
+export const HARDNESS_COEFFICIENTS = Object.freeze({ ca: 2.497, mg: 4.118 });
+
 /**
- * Hardness as CaCO3 (mg/L) from calcium and magnesium (mg/L).
- * Verified against the workbook: 2.497*Ca + 4.118*Mg.
- * Returns null if neither input is numeric.
+ * Hardness as CaCO3 (mg/L) from calcium and magnesium (mg/L):
+ * 2.497*Ca + 4.118*Mg. Returns null if neither input is numeric.
  */
 export function hardnessAsCaCO3(calciumMgL, magnesiumMgL) {
   const ca = toNumber(calciumMgL);
   const mg = toNumber(magnesiumMgL);
   if (ca === null && mg === null) return null;
-  return 2.497 * (ca ?? 0) + 4.118 * (mg ?? 0);
+  return HARDNESS_COEFFICIENTS.ca * (ca ?? 0) + HARDNESS_COEFFICIENTS.mg * (mg ?? 0);
 }
 
 /**

@@ -103,6 +103,19 @@ h2 { font-size: 17px; margin: 28px 0 10px; }
 .summary-pill.pass { background: var(--pass-bg); color: var(--pass); }
 .summary-pill.fail { background: var(--fail-bg); color: var(--fail); }
 
+.presets section { margin: 22px 0; }
+.presets h2 { font-size: 16px; margin: 0 0 10px; }
+.presets h3 { font-size: 13px; margin: 14px 0 6px; }
+.presets code { background: var(--section); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+.presets .formula { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
+.preset-table { border-collapse: collapse; width: 100%; font-size: 12.5px; background: var(--card); }
+.preset-table th, .preset-table td { border: 1px solid var(--border); padding: 5px 9px; text-align: left; vertical-align: top; }
+.preset-table th { background: var(--section); }
+.presets .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+.presets ul.kv { list-style: none; padding: 0; margin: 0; }
+.presets ul.kv li { display: flex; gap: 12px; padding: 4px 0; border-bottom: 1px dotted var(--border); }
+.presets ul.kv li span { flex: 0 0 130px; color: var(--muted); }
+
 .qc-modebar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
 .qc-controls-right { display: flex; align-items: center; gap: 14px; }
 .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }

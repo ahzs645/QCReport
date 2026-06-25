@@ -8,7 +8,7 @@
 // RESULTS row-16 labels here so the two sides match).
 
 import { numberToCol, toNumber } from "./sheet-utils.mjs";
-import { isOverRangeValue } from "./raw-parsers/normalize.mjs";
+import { baseSampleId, isOverRangeValue } from "./raw-parsers/normalize.mjs";
 import { matchSample } from "./sample-match.mjs";
 
 const SAMPLE_NAME_COL = numberToCol(1); // A
@@ -43,7 +43,9 @@ export function ingestInstrument(parsed, opts) {
   const rowBySampleId = new Map();
   const dilutionsBySampleId = new Map();
   for (const row of parsed.rows) {
-    const matched = matchSample(row.label, samples);
+    // Dilution reruns carry a "… Dil. 10X" suffix that breaks id matching — match
+    // on the base id so they attach to the right sample.
+    const matched = matchSample(row.isDilution ? baseSampleId(row.label) : row.label, samples);
     if (!matched) continue;
     const id = matched.sample.id;
     if (row.isDilution) {
@@ -61,12 +63,14 @@ export function ingestInstrument(parsed, opts) {
   const resolveValue = (id, key, value) => {
     if (!isOverRangeValue(value)) return value;
     if (resolveDilutions) {
+      // The diluted rerun's Conc value is already dilution-corrected by the
+      // instrument, so use it directly (do NOT multiply by the factor again).
       for (const dil of dilutionsBySampleId.get(id) || []) {
         const dv = dil.values[key];
         const num = dv === undefined || isOverRangeValue(dv) ? null : toNumber(dv);
         if (num !== null) {
           overRangeResolved += 1;
-          return num * dil.factor;
+          return num;
         }
       }
     }

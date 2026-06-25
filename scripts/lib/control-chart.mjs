@@ -10,6 +10,16 @@
 import { cellValue, numberToCol } from "./sheet-utils.mjs";
 import { toNumber } from "./sheet-utils.mjs";
 
+// Declarative description of the control-chart math (rendered in the app).
+export const CONTROL_CHART_INFO = Object.freeze({
+  centerLine: "mean of the LFB values (zeros/blanks ignored)",
+  spread: "sample standard deviation (n − 1)",
+  limitFormula: "mean ± k × σ   (k = 1, 2, 3)",
+  rpdFormula: "|measured − accepted value| ÷ accepted value × 100",
+  performanceRule: "PASS if RPD ≤ performance criterion",
+  defaults: { acceptedValue: 0.1, criterion: 20 }, // overridden by the loaded ControlChart workbook
+});
+
 /** Mean and sample (n−1) standard deviation of the non-zero, numeric values. */
 export function controlStats(values) {
   const nums = values.map(toNumber).filter((v) => v !== null && v !== 0);
