@@ -47,6 +47,7 @@ function CheckCard({ check }) {
             <li key={r.analyte}>
               <b>{r.analyte}</b> — {r.unit === undefined || r.unit === "%recovery" ? `${fmt(r.metric)}% recovery` : r.reportable}{" "}
               <span className="fail-tag">FAIL</span>
+              {r.note && <span className="qc-note"> — {r.note}</span>}
             </li>
           ))}
         </ul>
@@ -58,7 +59,7 @@ function CheckCard({ check }) {
             {check.results.map((r) => (
               <tr key={r.analyte} className={r.status === "FAIL" ? "row-fail" : ""}>
                 <td>{r.analyte}</td><td>{String(r.reportable)}</td>
-                <td>{r.metric === null ? r.unit || "" : `${fmt(r.metric)} ${r.unit || ""}`}</td><td>{r.status}</td>
+                <td>{r.metric === null ? r.unit || "" : `${fmt(r.metric)} ${r.unit || ""}`}{r.note ? ` — ${r.note}` : ""}</td><td>{r.status}</td>
               </tr>
             ))}
           </tbody>
@@ -114,7 +115,11 @@ function QcTable({ qc }) {
               <td className="analyte">{a}</td>
               {byCheck.map(({ check, map }) => {
                 const r = map.get(a);
-                return <td key={check.key} className={r ? statusClass(r.status) : ""}>{cellText(check, r)}</td>;
+                return (
+                  <td key={check.key} className={r ? statusClass(r.status) : ""} title={r?.note || undefined}>
+                    {cellText(check, r)}{r?.note ? " *" : ""}
+                  </td>
+                );
               })}
             </tr>
           ))}

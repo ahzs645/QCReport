@@ -1,23 +1,37 @@
-// Browser wrapper for the .esws (Agilent ICP Expert) parser. Reads the dropped
-// file as an ArrayBuffer and hands it to the shared, browser-portable parser in
-// ../../../scripts/lib. No server — the binary is unzipped and the .NET-NRBF
-// parts are decoded entirely in the browser.
+// Browser core for the .esws explorer. Loads the file once into a JSZip and
+// extracts the light run table up front; the heavier views (calibration, QC,
+// per-solution replicates, spectra) are pulled lazily from the same zip. No
+// server — everything is unzipped and decoded from .NET-NRBF in the browser.
 
-import { parseIcpoesEsws } from "../../../scripts/lib/raw-parsers/icpoes-esws.mjs";
+import JSZip from "jszip";
+import { buildContract, extractEsws } from "../../../scripts/lib/raw-parsers/icpoes-esws.mjs";
+import {
+  extractCalibration,
+  extractQc,
+  extractRunInfo,
+  extractSolutionDetail,
+  extractSpectra,
+} from "../../../scripts/lib/raw-parsers/esws-explore.mjs";
 
-/**
- * Parse a dropped .esws File into a flat display table.
- * @param {File} file
- * @param {"adjusted"|"unadjusted"} kind
- * @returns {Promise<{ fileName, kind, sheet, analytes, rows, count }>}
- */
-export async function parseEsws(file, kind = "adjusted") {
-  const buf = await file.arrayBuffer();
-  const { sheet, analytes, rows } = await parseIcpoesEsws(buf, { kind });
-  // Column order matches the parser's stable analyte sort.
-  const columns = analytes.map((a) => ({ key: a.key, label: a.rawLabel }));
-  return { fileName: file.name, kind, sheet, columns, rows, count: rows.length, analyteCount: columns.length };
+/** Load a dropped .esws File into a session (zip + base extract + run info). */
+export async function loadEsws(file) {
+  const zip = await JSZip.loadAsync(await file.arrayBuffer());
+  const extract = await extractEsws(zip);
+  const runInfo = await extractRunInfo(zip);
+  return { fileName: file.name, zip, extract, runInfo };
 }
+
+/** Flat results table for the given kind (adjusted / unadjusted). */
+export function resultsTable(session, kind = "adjusted") {
+  const { analytes } = session.extract;
+  const { rows } = buildContract(session.extract, kind);
+  return { columns: analytes.map((a) => ({ key: a.key, label: a.rawLabel })), rows, runs: session.extract.runs };
+}
+
+export const calibration = (session) => extractCalibration(session.zip);
+export const qc = (session, reportableKeys) => extractQc(session.zip, { reportableKeys });
+export const solutionDetail = (session, partName) => extractSolutionDetail(session.zip, partName);
+export const spectra = (session, solutionKey) => extractSpectra(session.zip, solutionKey);
 
 const csvCell = (v) => {
   if (v == null) return "";
@@ -25,18 +39,16 @@ const csvCell = (v) => {
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 
-/** Render a parsed table to CSV text matching the .xlsx layout (Solution Label + analytes). */
+/** Render a results table to CSV (Solution Label + analyte columns). */
 export function toCsv(table) {
   const header = ["Solution Label", ...table.columns.map((c) => c.label)];
   const lines = [header.map(csvCell).join(",")];
   for (const row of table.rows) {
-    const cells = [row.label, ...table.columns.map((c) => row.values[c.key])];
-    lines.push(cells.map(csvCell).join(","));
+    lines.push([row.label, ...table.columns.map((c) => row.values[c.key])].map(csvCell).join(","));
   }
   return lines.join("\n");
 }
 
-/** Trigger a client-side download of `text` as `filename`. */
 export function downloadText(text, filename, type = "text/csv") {
   const blob = new Blob([text], { type });
   const url = URL.createObjectURL(blob);

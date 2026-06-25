@@ -12,8 +12,10 @@ export default function PresetsView() {
     <div className="presets">
       <p className="sub">
         Everything the calculations use, read straight from the code (no hidden values). Detection
-        limits, units and CDWQ guidelines come from each workbook's CODES sheet; the constants below
-        are the encoded defaults (editable in <code>scripts/lib/</code>).
+        limits, units and CDWQ guidelines come from each workbook's CODES sheet; the QC acceptance
+        ranges, ± tolerances and SOP citations below are read live from the CODES “PERCENT
+        RECOVERIES” table when a workbook is dropped, and the values shown here are the encoded
+        fallback (editable in <code>scripts/lib/</code>).
       </p>
 
       <section>
@@ -59,6 +61,59 @@ export default function PresetsView() {
         </table>
       </section>
 
+      <section>
+        <h2>Acceptance ranges (% recovery / RPD)</h2>
+        <p className="hint">From the CODES “PERCENT RECOVERIES” table — each range with its ± tolerance and the SOP it cites.</p>
+        <table className="preset-table">
+          <thead><tr><th>Check</th><th>Range</th><th>± tolerance</th><th>Source (SOP)</th></tr></thead>
+          <tbody>
+            {Object.entries(c.ranges).map(([k, r]) => (
+              <tr key={k}>
+                <td><b>{k}</b></td>
+                <td>{range(r)}</td>
+                <td>{c.rangeInfo?.[k]?.tolerance != null ? `±${c.rangeInfo[k].tolerance}%` : "—"}</td>
+                <td className="hint">{c.rangeInfo?.[k]?.citation || "—"}</td>
+              </tr>
+            ))}
+            <tr>
+              <td><b>IPC / NALS blank</b></td>
+              <td>&lt; RL</td>
+              <td>—</td>
+              <td className="hint">{c.citations?.ipcBlank || "—"}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Conditional QC interpretations</h2>
+        <p className="hint">
+          Extra acceptability logic the workbook applies on top of the recovery/blank numbers
+          (BATCH rows 102, 106–107). Shown as a note in the QC panel; doesn't change the raw metric.
+        </p>
+        <table className="preset-table">
+          <thead><tr><th>Applies to</th><th>Condition</th><th>Outcome</th><th>Source (SOP)</th></tr></thead>
+          <tbody>
+            {Object.entries(QC_CHECKS).filter(([, d]) => d.matrixComparison).map(([key]) => (
+              <tr key={key}>
+                <td><b>{QC_ROLE_LABELS[key] || key}</b> <span className="hint">(failed blank)</span></td>
+                <td className="formula">blank ÷ sample × 100 &lt; {c.matrixBlank.matrixPct}%  OR  blank &lt; {c.matrixBlank.rlMultiple} × RL</td>
+                <td>still acceptable — flagged, not a true fail</td>
+                <td className="hint">{c.matrixBlank.citation || "—"}</td>
+              </tr>
+            ))}
+            {Object.entries(QC_CHECKS).filter(([, d]) => d.spikeMatrixCheck).map(([key]) => (
+              <tr key={key}>
+                <td><b>{QC_ROLE_LABELS[key] || key}</b></td>
+                <td className="formula">spike (true value) ÷ sample background &lt; {c.lfmSpikeMinMatrix}</td>
+                <td>“spike &lt; {Math.round(c.lfmSpikeMinMatrix * 100)}% of sample matrix” — recovery not meaningful</td>
+                <td className="hint">{c.rangeInfo?.lfm?.citation || "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
       <section className="two-col">
         <div>
           <h3>QC true values (mg/L)</h3>
@@ -67,20 +122,15 @@ export default function PresetsView() {
               {Object.entries(c.trueValues).map(([k, v]) => (<tr key={k}><td>{k}</td><td><b>{v}</b></td></tr>))}
             </tbody>
           </table>
-          <h3>Element overrides</h3>
-          {c.elementOverrides?.length ? (
-            <ul>{c.elementOverrides.map((o, i) => (
-              <li key={i}><code>{o.match}</code> → {o.trueKey} true value = <b>{o.value}</b> <span className="hint">(µg/L unit)</span></li>
-            ))}</ul>
-          ) : <p className="hint">none</p>}
         </div>
         <div>
-          <h3>Acceptance ranges (% recovery / RPD)</h3>
-          <table className="preset-table">
-            <tbody>
-              {Object.entries(c.ranges).map(([k, r]) => (<tr key={k}><td>{k}</td><td>{range(r)}</td></tr>))}
-            </tbody>
-          </table>
+          <h3>Element overrides (Hg in µg/L)</h3>
+          {c.elementOverrides?.length ? (
+            <ul>{c.elementOverrides.map((o, i) => (
+              <li key={i}><code>{o.match}</code> → {o.trueKey} true value = <b>{o.value}</b> <span className="hint">(µg/L)</span></li>
+            ))}</ul>
+          ) : <p className="hint">none</p>}
+          <p className="hint">Mercury is reported in µg/L, so its true values are 100× the mg/L standards (CODES col C).</p>
         </div>
       </section>
 

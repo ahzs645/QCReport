@@ -50,10 +50,68 @@ const member = (obj, name) => (obj && obj.members ? obj.members[name] : undefine
 const fmtWavelength = (n) => Number(n).toFixed(3);
 
 /** Read a ZIP part as a parsed NRBF object graph, or null if the part is absent. */
-async function readPart(zip, name) {
+export async function readPart(zip, name) {
   const file = zip.file(name);
   if (!file) return null;
   return parseNrbf(await file.async("uint8array"));
+}
+
+/**
+ * Analyte columns from Method/NewElementWavelengths, keyed by ElementWavelength Id.
+ * @returns {Promise<{ analytes, analyteById }>}
+ */
+export async function readAnalytes(zip) {
+  const ewGraph = await readPart(zip, ELEMENT_WAVELENGTHS);
+  if (!ewGraph) throw new Error("Missing Method/NewElementWavelengths in .esws");
+  const analyteById = new Map();
+  const analytes = [];
+  for (const obj of ewGraph.objects.values()) {
+    if (!endsWith(obj, "NewElementWavelengthDataType")) continue;
+    const wavelength = member(member(obj, "Wavelength"), "value");
+    if (wavelength == null) continue;
+    const symbol = member(obj, "ElementSymbol");
+    // ICP Expert disambiguates plasma views with a Label suffix ("Ba-A", "Sr-R",
+    // "Cu-A"); the .xlsx column headers use this Label, not the bare element symbol.
+    const label = member(obj, "Label") ?? symbol;
+    const rawLabel = `${label} ${fmtWavelength(wavelength)} nm`;
+    const calMax = member(member(obj, "CalibrationRange"), "Maximum");
+    const entry = { id: member(obj, "Id"), element: String(symbol), wavelength, rawLabel, key: normalizeAnalyteLabel(rawLabel), calMax };
+    analyteById.set(entry.id, entry);
+    analytes.push(entry);
+  }
+  // Stable, deterministic column order: element symbol then wavelength.
+  analytes.sort((a, b) => a.rawLabel.localeCompare(b.rawLabel, "en", { numeric: true }));
+  analytes.forEach((a, i) => { a.col = numberToCol(4 + i); });
+  return { analytes, analyteById };
+}
+
+/** Solution definitions across all *SolutionDefinitions parts, keyed by GUID Key. */
+export async function readDefinitions(zip) {
+  const defByKey = new Map();
+  for (const part of DEFINITION_PARTS) {
+    const graph = await readPart(zip, part);
+    if (!graph) continue;
+    for (const obj of graph.objects.values()) {
+      if (!endsWith(obj, "SolutionDefinitionDataType")) continue;
+      const key = member(obj, "Key");
+      if (key == null) continue;
+      defByKey.set(key, {
+        name: member(obj, "Name"),
+        dilution: member(obj, "Dilution") || 1,
+        weight: member(obj, "Weight"),
+        volume: member(obj, "Volume"),
+        solType: member(member(obj, "SolType"), "value__"),
+      });
+    }
+  }
+  return defByKey;
+}
+
+/** Names of the Solution result parts, in run (numeric) order. */
+export function solutionPartNames(zip) {
+  return Object.keys(zip.files)
+    .filter((n) => n.startsWith(SOLUTION_DIR) && !zip.files[n].dir && /Solution\d+$/.test(n))
+    .sort((a, b) => solutionIndex(a) - solutionIndex(b));
 }
 
 /** True if a loaded JSZip looks like an ICP Expert .esws worksheet. */
@@ -99,53 +157,9 @@ export async function parseIcpoesEswsZip(zip, opts = {}) {
  *   { adjusted, unadjusted, intensity, rsd, over } plus solution metadata.
  */
 export async function extractEsws(zip) {
-  // 1) Analyte columns, keyed by ElementWavelength Id.
-  const ewGraph = await readPart(zip, ELEMENT_WAVELENGTHS);
-  if (!ewGraph) throw new Error("Missing Method/NewElementWavelengths in .esws");
-  const analyteById = new Map();
-  const analytes = [];
-  for (const obj of ewGraph.objects.values()) {
-    if (!endsWith(obj, "NewElementWavelengthDataType")) continue;
-    const wavelength = member(member(obj, "Wavelength"), "value");
-    if (wavelength == null) continue;
-    const symbol = member(obj, "ElementSymbol");
-    // ICP Expert disambiguates plasma views with a Label suffix ("Ba-A", "Sr-R",
-    // "Cu-A"); the .xlsx column headers use this Label, not the bare element symbol.
-    const label = member(obj, "Label") ?? symbol;
-    const rawLabel = `${label} ${fmtWavelength(wavelength)} nm`;
-    const calMax = member(member(obj, "CalibrationRange"), "Maximum");
-    const entry = { id: member(obj, "Id"), element: String(symbol), wavelength, rawLabel, key: normalizeAnalyteLabel(rawLabel), calMax };
-    analyteById.set(entry.id, entry);
-    analytes.push(entry);
-  }
-  // Stable, deterministic column order: element symbol then wavelength.
-  analytes.sort((a, b) => a.rawLabel.localeCompare(b.rawLabel, "en", { numeric: true }));
-  analytes.forEach((a, i) => { a.col = numberToCol(4 + i); });
-
-  // 2) Solution definitions, keyed by GUID Key → { name, dilution, weight, volume, solType }.
-  const defByKey = new Map();
-  for (const part of DEFINITION_PARTS) {
-    const graph = await readPart(zip, part);
-    if (!graph) continue;
-    for (const obj of graph.objects.values()) {
-      if (!endsWith(obj, "SolutionDefinitionDataType")) continue;
-      const key = member(obj, "Key");
-      if (key == null) continue;
-      defByKey.set(key, {
-        name: member(obj, "Name"),
-        dilution: member(obj, "Dilution") || 1,
-        weight: member(obj, "Weight"),
-        volume: member(obj, "Volume"),
-        solType: member(member(obj, "SolType"), "value__"),
-      });
-    }
-  }
-
-  // 3) One run per measured solution. ICP Expert numbers parts Solution0..N in
-  //    sequence order; sort numerically so runs mirror the run order.
-  const solutionNames = Object.keys(zip.files)
-    .filter((n) => n.startsWith(SOLUTION_DIR) && !zip.files[n].dir && /Solution\d+$/.test(n))
-    .sort((a, b) => solutionIndex(a) - solutionIndex(b));
+  const { analytes, analyteById } = await readAnalytes(zip);
+  const defByKey = await readDefinitions(zip);
+  const solutionNames = solutionPartNames(zip);
 
   const runs = [];
   let rowNum = 1;
@@ -190,6 +204,8 @@ export async function extractEsws(zip) {
     rowNum += 1;
     runs.push({
       row: rowNum,
+      part: name,
+      solutionKey: member(sol, "SolutionKey"),
       label: label.trim(),
       isDilution: isDilution(label),
       dilutionFactor: dilutionFactor(label) || dilution,

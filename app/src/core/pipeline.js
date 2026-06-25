@@ -6,11 +6,13 @@
 
 import JSZip from "jszip";
 import { buildSpec, findHeaderFields, getClientSamples, loadWorkbook } from "../../../scripts/lib/results-workbook.mjs";
-import { parseIcpoesConcWorkbook } from "../../../scripts/lib/raw-parsers/icpoes-conc.mjs";
+import { isIcpoesConcWorkbook, parseIcpoesConcWorkbook } from "../../../scripts/lib/raw-parsers/icpoes-conc.mjs";
 import { buildContract, extractEsws, isEswsZip } from "../../../scripts/lib/raw-parsers/icpoes-esws.mjs";
+import { buildIdentityIndex, isHotBlockWorkbook, isLabelsWorkbook, parseHotBlock, parseLabels } from "../../../scripts/lib/raw-parsers/sample-prep.mjs";
+import { normalizeSampleId } from "../../../scripts/lib/raw-parsers/normalize.mjs";
 import { ingestQcBatch, parseQcBatch } from "../../../scripts/lib/qc-batch.mjs";
 import { ingestIcpoes } from "../../../scripts/lib/ingest.mjs";
-import { runQcCheck } from "../../../scripts/lib/qc-engine.mjs";
+import { DEFAULT_QC_CRITERIA, parseQcCriteria, runQcCheck } from "../../../scripts/lib/qc-engine.mjs";
 import { applyEdits, groupCellsBySheet, loadXlsxZip } from "../../../scripts/lib/xlsx-zip.mjs";
 import { computeReportMatrix, detectClientSamples, reportableAnalyteKeys } from "../../../scripts/lib/report-compute.mjs";
 
@@ -29,8 +31,42 @@ async function fetchBuffer(url) {
 function classify(wb) {
   if (wb.getWorksheet("BATCH")) return "qc";
   if (wb.worksheets.some((s) => /^REPORT DATA/i.test(s.name))) return "results";
-  if (wb.worksheets.some((s) => /^(conc|concentration)$/i.test(s.name))) return "raw";
+  if (isHotBlockWorkbook(wb)) return "hotblock";
+  if (isLabelsWorkbook(wb)) return "labels";
+  if (isIcpoesConcWorkbook(wb)) return "raw";
   return "unknown";
+}
+
+/**
+ * Overlay the prep-sheet identity index onto a roster. Friendly names come from
+ * HotBlock when the roster doesn't already have one; prep/QC rows (Method Blank,
+ * DUP, SPIKED, ICV) are dropped from a *detected* roster since they aren't client
+ * samples. Each surviving sample carries its identity (name/rack/role) for the UI.
+ * @param {boolean} fromResults - roster came from a RESULTS workbook (authoritative names)
+ */
+function applyIdentity(samples, index, { fromResults }) {
+  const warnings = [];
+  const out = [];
+  for (const s of samples) {
+    const id = index.get(normalizeSampleId(s.id));
+    if (id?.prepRole && !fromResults) {
+      // A detected "client" row that prep records as QC/prep — exclude it.
+      warnings.push({ kind: "prep_row_excluded", id: s.id, role: id.prepRole, name: id.sampleName });
+      continue;
+    }
+    let name = s.name;
+    if (id?.sampleName) {
+      if (fromResults && s.name && normalizeSampleId(s.name) !== normalizeSampleId(id.sampleName)) {
+        warnings.push({ kind: "name_mismatch", id: s.id, results: s.name, prep: id.sampleName });
+      } else if (!fromResults || !s.name || /\d{4}\s*nals/i.test(s.name)) {
+        name = id.sampleName; // fill from prep when detected/blank/still-an-id
+      }
+    }
+    out.push({ ...s, name, identity: id || null });
+  }
+  // Re-number sequentially so excluded prep rows don't leave gaps in the output
+  // band (samples from a RESULTS workbook carry an explicit row and ignore index).
+  return { samples: out.map((s, index) => ({ ...s, index })), warnings };
 }
 
 /**
@@ -58,6 +94,15 @@ export async function analyze(files) {
   }
   const resultsDrop = loaded.find((x) => x.kind === "results");
   const qcDrop = loaded.find((x) => x.kind === "qc");
+  const hotblockDrop = loaded.find((x) => x.kind === "hotblock");
+  const labelsDrop = loaded.find((x) => x.kind === "labels");
+
+  // Cross-reference sheets (optional): HotBlock digestion supplies friendly sample
+  // names + QC/prep roles; Labels supplies the rack layout. Both join the run on
+  // the NALS id + position. Absent → the roster falls back to its prior source.
+  const hotblock = hotblockDrop ? parseHotBlock(hotblockDrop.wb) : null;
+  const labels = labelsDrop ? parseLabels(labelsDrop.wb) : null;
+  const identity = buildIdentityIndex({ hotblock, labels });
 
   // Spec from a dropped RESULTS workbook, else from the bundled blank template.
   const specWb = resultsDrop ? resultsDrop.wb : await loadWorkbook(await fetchBuffer(RESULTS_TPL));
@@ -82,12 +127,27 @@ export async function analyze(files) {
   }
   const rawName = rawEsws ? rawEsws.file.name : rawWb.file.name;
 
-  // Samples: friendly names from a dropped RESULTS, else detected from the raw.
-  const samples = resultsDrop ? getClientSamples(resultsDrop.wb, spec) : detectClientSamples(conc);
+  // Samples: friendly names from a dropped RESULTS, else detected from the raw —
+  // then enriched/cross-checked against the prep-sheet identity index.
+  const baseSamples = resultsDrop ? getClientSamples(resultsDrop.wb, spec) : detectClientSamples(conc);
+  const enriched = applyIdentity(baseSamples, identity, { fromResults: Boolean(resultsDrop) });
+  const samples = enriched.samples;
 
-  // QC model: dropped QC workbook (full, exact roles) else bundled blank template.
-  const qcModel = qcDrop ? parseQcBatch(qcDrop.wb) : parseQcBatch(await loadWorkbook(await fetchBuffer(QC_TPL)));
-  const qc = runQcCheck(qcModel, unadj);
+  // QC model + acceptance criteria: dropped QC workbook (full, exact roles + its
+  // own CODES limits) else the bundled blank template. The CODES "PERCENT
+  // RECOVERIES" table drives the ranges/tolerances/citations so they're never
+  // hardcoded — defaults apply only if CODES can't be read.
+  const qcWb = qcDrop ? qcDrop.wb : await loadWorkbook(await fetchBuffer(QC_TPL));
+  const qcModel = parseQcBatch(qcWb);
+  const qcCriteria = parseQcCriteria(qcWb) || DEFAULT_QC_CRITERIA;
+  const qc = runQcCheck(qcModel, unadj, qcCriteria);
+
+  // QC/prep roles the HotBlock sheet records independently of the QC workbook
+  // (Method Blank / DUP / SPIKED / ICV) — a cross-reference for the SAMPLE,
+  // DUPLICATE and LFM role assignments.
+  const qcRoleHints = (hotblock?.samples || [])
+    .filter((s) => s.prepRole)
+    .map((s) => ({ id: s.id, role: s.prepRole, name: s.sampleName }));
 
   // RESULTS preview (computed in code).
   const reportMatrix = computeReportMatrix(spec, samples, conc);
@@ -101,11 +161,23 @@ export async function analyze(files) {
       results: resultsDrop?.file.name || null,
       qc: qcDrop?.file.name || null,
       qcRoleSource: qcDrop ? "dropped QC workbook" : "bundled template (deterministic roles)",
+      qcCriteriaSource: parseQcCriteria(qcWb) ? `CODES sheet (${qcDrop ? "dropped QC workbook" : "bundled template"})` : "encoded defaults",
+      hotblock: hotblockDrop?.file.name || null,
+      labels: labelsDrop?.file.name || null,
+      nameSource: resultsDrop ? "RESULTS workbook" : hotblock ? "HotBlock digestion" : "raw NALS IDs",
     },
     version: spec.version,
     samples,
     reportMatrix,
     qc,
+    qcCriteria,
+    qcRoleHints,
+    prep: {
+      hasHotBlock: Boolean(hotblock),
+      hasLabels: Boolean(labels),
+      entries: [...identity.values()],
+      warnings: enriched.warnings,
+    },
     reportableAnalytes: [...reportableAnalyteKeys(spec)],
     resultsHeaderRefs: findHeaderFields(specWb, "ICPOES RESULTS"),
     // retained for downloads

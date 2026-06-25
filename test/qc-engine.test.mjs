@@ -3,9 +3,11 @@ import {
   blankPassFail,
   classify,
   correctedRecovery,
+  matrixBlankVerdict,
   recovery,
   roleKey,
   rpd,
+  spikeBelowMatrix,
 } from "../scripts/lib/qc-engine.mjs";
 
 describe("blankPassFail", () => {
@@ -45,6 +47,39 @@ describe("classify", () => {
     expect(classify(100, [90, 110])).toBe("PASS");
     expect(classify(120, [90, 110])).toBe("FAIL");
     expect(classify(null, [90, 110])).toBe("n/a");
+  });
+});
+
+describe("matrixBlankVerdict (failed-LRB acceptability, BATCH 106–107)", () => {
+  it("acceptable when below 10% of the sample matrix (verbatim workbook label)", () => {
+    const v = matrixBlankVerdict(0.05, 1.0, 0.01); // 0.05/1.0 = 5% < 10%
+    expect(v.acceptable).toBe(true);
+    expect(v.matrixVerdict).toBe("<10% Matrix");
+  });
+  it("acceptable when below 2.2× the reporting limit", () => {
+    const v = matrixBlankVerdict(0.015, 0.05, 0.01); // 30% matrix (fails) but < 2.2×0.01 = 0.022
+    expect(v.acceptable).toBe(true);
+    expect(v.matrixVerdict).toBe(">10% Matrix");
+    expect(v.rlVerdict).toBe("<2.2X RL");
+  });
+  it("not acceptable when over both thresholds", () => {
+    const v = matrixBlankVerdict(0.5, 1.0, 0.01); // 50% matrix and > 0.022
+    expect(v.acceptable).toBe(false);
+    expect(v.matrixVerdict).toBe(">10% Matrix");
+    expect(v.rlVerdict).toBe(">2.2X RL");
+  });
+});
+
+describe("spikeBelowMatrix (LFM spike <30% of sample, BATCH 102)", () => {
+  it("flags when the spike is a small fraction of the background", () => {
+    expect(spikeBelowMatrix(0.1, 1.0)).toBe(true); // 0.1/1.0 = 10% < 30%
+  });
+  it("does not flag when the spike is a meaningful fraction", () => {
+    expect(spikeBelowMatrix(0.1, 0.2)).toBe(false); // 50% ≥ 30%
+  });
+  it("does not flag when there is no measurable background", () => {
+    expect(spikeBelowMatrix(0.1, 0)).toBe(false);
+    expect(spikeBelowMatrix(0.1, null)).toBe(false);
   });
 });
 

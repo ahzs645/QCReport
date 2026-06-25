@@ -51,8 +51,13 @@ map of `objectId → object`, with `{__ref}` placeholders resolved against that 
 ```
 NewElementWavelengthDataType        (Method/NewElementWavelengths → array)
   Id                  ← analyte key (join target)
-  ElementSymbol       "Ag"
-  Wavelength.value    328.068      → label "Ag 328.068 nm"
+  ElementSymbol       "Ba"
+  Label               "Ba-A"       ← used for the column header, NOT ElementSymbol:
+                                      ICP Expert disambiguates plasma views with a
+                                      suffix ("Ba-A" axial, "Sr-R" radial, "Cu-A").
+                                      The .xlsx headers use Label, so we must too,
+                                      or parameters like Barium fail to match.
+  Wavelength.value    455.403      → label "Ba-A 455.403 nm"
   CalibrationRange.Maximum         → over-range threshold (see caveat)
   ConcentrationUnit
 
@@ -97,14 +102,34 @@ against the `Raw Data` (adjusted) and `Unadjusted Conc` sheets of both files:
 
 All **15,211 concentration values are exact**; over-range is **213/214**.
 
-### Known caveat — the over-range `o` flag
+### Result flags
 
-The displayed `o` means "above the top calibration **standard**", which sits ~10%
-below `CalibrationRange.Maximum` (the curve's curvature limit). Using `calMax` is
-**conservative**: it produced **zero false positives**, and the single miss
-(`Te 182.153` at `1.0962`, below `calMax 1.1`) is a value in that 10% headroom
-band. Exact parity would require parsing per-analyte standard concentrations from
-`Method/Standards`. The concentration values themselves are unaffected.
+- **`Uncal`** — a measured line with no concentration (internal standards
+  Sc/Y/Bi/Li): `ConcentrationCalculator.average` is null but `HasBeenMeasured`.
+  Emitted as `"Uncal"` to match the .xlsx (the RESULTS sheet treats it specially).
+- **`o` over-range** — `unadjusted > CalibrationRange.Maximum`. `calMax` (≈ top
+  standard + 10%) is **conservative**: zero false positives, 213/214 cells; the
+  one miss (`Te 182.153` at `1.0962`) sits in the 10% headroom band.
+- **`u` under-range — NOT reproduced.** ICP Expert's `u` is not derivable from the
+  decoded parts: `Method/MDL` is null, and "below the lowest calibration standard"
+  over-flags normal readings (water `Cu 0.00067` is below its lowest standard
+  `0.01` yet shown as a plain number). We deliberately do **not** guess, because a
+  wrong `u` forces real detections to `<DL` — worse than omitting it.
+
+### Faithfulness for the ingestion path
+
+Feeding the .esws through the same `ingestIcpoes` → `computeReportMatrix` as the
+.xlsx (with the bundled RESULTS template) gives:
+
+- **Water samples (Weight = Volume = 1): faithful.** The only report differences
+  are DL-boundary rounding — the .xlsx stores values pre-rounded to 4 decimals, so
+  a sub-DL reading like `0.00067` shows as `0.0007 (= DL)` there but correctly as
+  `<DL` from the full-precision .esws. The .esws is *more* accurate.
+- **Digestion samples (Weight/Volume ≠ 1): one known gap.** Because the reported
+  value = unadjusted × Dilution × (Volume/Weight), a sub-calibration reading can be
+  amplified above the workbook detection limit and report a number where the
+  analyst's `u`-flagged .xlsx shows `<DL` (e.g. `Mercury 538` vs `<7`). Resolving
+  this needs the lab's exact under-range/reporting-limit convention.
 
 ## Where this lives
 
@@ -112,6 +137,29 @@ band. Exact parity would require parsing per-analyte standard concentrations fro
 - `scripts/lib/raw-parsers/icpoes-esws.mjs` — `.esws` → `{ analytes, rows }`
   (the same contract as `icpoes-conc.mjs`, so it can later feed the same ingest
   path as an alternative ICPOES source).
-- `app/src/views/EwsParserView.jsx` + `app/src/core/esws.js` — the standalone
-  **EWS Parser** tab (unzip + decode in-browser, table + CSV/JSON export).
+- `app/src/views/EwsParserView.jsx` + `app/src/views/ews/*` + `app/src/core/esws.js`
+  — the standalone **EWS Parser** tab, with sub-views:
+  - **Results** — table with concentration / intensity / %RSD modes, CSV export, and
+    a per-solution replicate drill-down.
+  - **Calibration** — per-analyte intensity-vs-concentration curve from the standards
+    with an OLS fit + R² (`extractCalibration`).
+  - **QC** — CCV/blank/spike solutions in run order with % recovery (green 90–110 /
+    red) and ICP Expert's pass/fail (`extractQc`).
+  - **Spectra** — raw emission line windows (intensity vs wavelength) per solution,
+    labelled by line (`extractSpectra`, keyed by `Results/Spectrum/<SolutionKey>`).
+- `scripts/lib/raw-parsers/esws-explore.mjs` — the exploration extractors
+  (calibration, QC, per-solution replicates, run info, spectra).
+- `app/src/components/EwsCharts.jsx` — dependency-free SVG calibration/spectrum plots
+  ("Classic" chart style).
+- `app/src/components/EwsChartsRich.jsx` — Recharts versions, same props ("Rich"
+  style). Lazy-loaded via `charts.js` (its own chunk) so Classic mode and the rest
+  of the app never download Recharts. The **Chart style: Classic / Rich** toggle in
+  the EWS tab switches between them (preference persisted to localStorage).
+- `app/src/core/pipeline.js` — the main Quality-Check/Results flow accepts a
+  dropped `.esws` directly (single `extractEsws`, then `buildContract` for the
+  adjusted + unadjusted views), so it can replace the manual "Export to Excel" step.
 - `test/nrbf.test.mjs` — round-trip test of the reader on a synthetic stream.
+
+`extractEsws(zip)` does the one-time NRBF parse and also captures per-measurement
+`intensity` and `rsd` (for exploration views); `buildContract(extract, kind)`
+derives the icpoes-conc-compatible view cheaply.

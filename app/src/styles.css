@@ -144,6 +144,19 @@ table.qc-matrix td.qc-out { background: var(--fail-bg); color: var(--fail); font
 .qc-badge.na { background: #eee; color: var(--muted); }
 .qc-fails { margin: 10px 0 0; padding-left: 18px; font-size: 13px; }
 .qc-fails .fail-tag { background: var(--fail-bg); color: var(--fail); }
+.qc-note { color: var(--muted); font-style: italic; font-size: 12px; }
+
+.prep-warn { margin: 4px 0 12px; padding: 8px 12px; background: #fff8e6; border: 1px solid #f0d9a0; border-radius: 8px; }
+.prep-warn .hint { color: #6b5500; }
+
+.rackview .rack-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+.rack-col { flex: 0 0 200px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.rack-col-head { background: var(--section); font-weight: 600; padding: 5px 8px; font-size: 12px; }
+.rack-cell { display: flex; flex-direction: column; gap: 1px; padding: 5px 8px; border-top: 1px solid var(--border); font-size: 12px; }
+.rack-cell.is-prep { background: #fff6e6; }
+.rack-cell .rack-pos { font-family: ui-monospace, Menlo, monospace; color: var(--muted); font-size: 11px; }
+.rack-cell .rack-name { font-weight: 600; }
+.rack-cell .rack-role { color: var(--accent); font-size: 11px; }
 .qc-detail { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
 .qc-detail th, .qc-detail td { border-bottom: 1px solid var(--border); padding: 3px 6px; text-align: left; }
 .qc-detail .row-fail { background: var(--fail-bg); }
@@ -155,3 +168,7 @@ table.results thead th { position: sticky; top: 0; background: var(--section); }
 table.results .param { font-weight: 600; }
 table.results .val { text-align: right; font-variant-numeric: tabular-nums; }
 table.results .section-row td { background: var(--section); font-weight: 700; }
+
+/* EWS explorer */
+.filter { font: inherit; color: var(--text); background: var(--card); }
+.linkish { border: 0; background: none; color: var(--accent); cursor: pointer; padding: 0; font: inherit; text-decoration: underline; }

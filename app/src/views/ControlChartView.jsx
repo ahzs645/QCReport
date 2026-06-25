@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import DropZone from "../components/DropZone.jsx";
 import ControlChart from "../components/ControlChart.jsx";
+import { CHART_STYLES, loadChartStyle, saveChartStyle } from "../components/charts.js";
 import { extractLfbFromRun, loadControlChartFile, parsePasted, seriesFor } from "../core/control.js";
 
 const iso = (d) => (d ? new Date(d).toISOString().slice(0, 10) : "");
@@ -16,6 +17,9 @@ export default function ControlChartView() {
   const [busy, setBusy] = useState(false);
   const [pasteText, setPasteText] = useState("");
   const [showLine, setShowLine] = useState(false);
+  const [chartStyle, setChartStyle] = useState(loadChartStyle);
+
+  const chooseChartStyle = (id) => { setChartStyle(id); saveChartStyle(id); };
 
   // Apply a freshly-loaded dataset (from a file or pasted text).
   function applyData(rd, chartedElements) {
@@ -112,12 +116,20 @@ export default function ControlChartView() {
             <label className="toggle">
               <input type="checkbox" checked={showLine} onChange={(e) => setShowLine(e.target.checked)} /> Connect points
             </label>
+            <label className="toggle">
+              Chart style
+              <span className="seg" style={{ marginLeft: 6 }}>
+                {CHART_STYLES.map((s) => (
+                  <button key={s.id} className={chartStyle === s.id ? "on" : ""} onClick={() => chooseChartStyle(s.id)}>{s.label}</button>
+                ))}
+              </span>
+            </label>
             <span className="meta-inline">
               {rawData.batches.length} batches · {rawData.variable} · accepted {rawData.acceptedValue} mg/L
               {runPoints.length > 0 && ` · +${runPoints.length} run point(s)`}
             </span>
           </div>
-          {series && <ControlChart series={series} showLine={showLine} title={`${elementName} — Digest LFB control chart`} />}
+          {series && <ControlChart series={series} showLine={showLine} chartStyle={chartStyle} title={`${elementName} — Digest LFB control chart`} />}
         </>
       )}
     </>

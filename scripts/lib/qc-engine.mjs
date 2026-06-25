@@ -14,15 +14,37 @@
 // test/qc-engine.test.mjs and cross-checked against the real QC workbook.
 
 import { reportableValue } from "./formula-engine.mjs";
-import { toNumber } from "./sheet-utils.mjs";
+import { cellValue, toNumber } from "./sheet-utils.mjs";
 import { normalizeSampleId } from "./raw-parsers/normalize.mjs";
 
+// Defaults mirror the QC workbook's CODES "PERCENT RECOVERIES" table (rows 32–50)
+// verbatim, including the EPA 200.7 / Standard Method citations. parseQcCriteria()
+// reads these straight from a loaded workbook's CODES sheet so the live values
+// always win; these are the fallback when no workbook CODES is available.
 export const DEFAULT_QC_CRITERIA = Object.freeze({
-  trueValues: { spike: 0.1, ccv: 0.5, icv: 0.5 },
-  ranges: { ccv: [90, 110], icv: [90, 110], lfb: [85, 115], lfm: [80, 120], interference: [85, 115], rpd: [0, 20] },
-  // Per-element true-value overrides. Mercury is reported in µg/L, so its spike
-  // true-value is 100× the mg/L standards — matching the workbook's LFB recovery.
-  elementOverrides: [{ match: "^Hg ", trueKey: "spike", value: 10 }],
+  trueValues: { spike: 0.1, ccv: 0.5, icv: 0.5 }, // CODES B48/B49/B50 (mg/L)
+  ranges: { ccv: [90, 110], icv: [95, 105], lfb: [80, 120], lfm: [70, 130], interference: [70, 130], rpd: [0, 20] },
+  // ± tolerance and the SOP citation behind each range (CODES col B / col E).
+  rangeInfo: {
+    ccv: { tolerance: 10, citation: "EPA 200.7, §9.3.4" },
+    icv: { tolerance: 5, citation: "Standard Method 1020 B" },
+    lfb: { tolerance: 20, citation: "EPA 200.7, §9.3.2" },
+    lfm: { tolerance: 30, citation: "EPA 200.7, §9.3.5" },
+    interference: { tolerance: 30, citation: "EPA 200.7, §9.3.5 (uses LFM values)" },
+    rpd: { tolerance: 20, citation: "Standard Method 1020 B; BCMOE Section C Metals C-9" },
+  },
+  // A failed digest blank (LRB) is still acceptable if it's below either threshold;
+  // an LFM spike < this fraction of the sample background gives an uninterpretable recovery.
+  matrixBlank: { matrixPct: 10, rlMultiple: 2.2, rule: "<RL or up to 10% of sample matrix or 2.2X RL", citation: "EPA 200.7, §9.3.1" }, // CODES C36 / D36
+  lfmSpikeMinMatrix: 0.3, // spike must be ≥30% of sample background to interpret recovery (BATCH row 102)
+  // Per-element true-value overrides. Mercury is reported in µg/L, so its true
+  // values are 100× the mg/L standards (CODES col C: spike 10, CCV/ICV 50 µg/L).
+  elementOverrides: [
+    { match: "^Hg ", trueKey: "spike", value: 10 },
+    { match: "^Hg ", trueKey: "ccv", value: 50 },
+    { match: "^Hg ", trueKey: "icv", value: 50 },
+  ],
+  citations: { ipcBlank: "EPA 200.7, §9.3.4" }, // IPC/NALS blank rule (CODES row 33)
 });
 
 /** Resolve the true value for an analyte + QC type, applying element overrides. */
@@ -78,20 +100,110 @@ export const QC_ROLE_LABELS = Object.freeze({
 // reference rows used by other checks, not checks themselves.
 export const QC_CHECKS = {
   ipcBlank: { kind: "blank" },
-  lrb: { kind: "blank" },
+  lrb: { kind: "blank", matrixComparison: true }, // failed LRB: also check vs 10% matrix / 2.2×RL
   ccvCalib: { kind: "recovery", trueKey: "ccv", range: "ccv" },
   ccvBatch: { kind: "recovery", trueKey: "ccv", range: "ccv" },
   icv: { kind: "recovery", trueKey: "icv", range: "icv" },
   digestLfb: { kind: "correctedRecovery", trueKey: "spike", blankKey: "lrb", range: "lfb" },
   instLfb: { kind: "correctedRecovery", trueKey: "spike", blankKey: "ipcBlank", range: "lfb" },
   interference: { kind: "correctedRecovery", trueKey: "spike", blankKey: "ipcBlank", range: "interference" },
-  lfmSpike: { kind: "correctedRecovery", trueKey: "spike", blankKey: "lfmBackground", range: "lfm" },
+  lfmSpike: { kind: "correctedRecovery", trueKey: "spike", blankKey: "lfmBackground", range: "lfm", spikeMatrixCheck: true },
   duplicate: { kind: "rpd", pairKey: "sample", range: "rpd" },
 };
 
 export function roleKey(roleLabel) {
   for (const [re, key] of ROLE_KEYS) if (re.test(roleLabel)) return key;
   return null;
+}
+
+// Which acceptance-range category each QC role uses (roles share categories).
+const RANGE_CATEGORY = {
+  ccvCalib: "ccv", ccvBatch: "ccv", icv: "icv",
+  digestLfb: "lfb", instLfb: "lfb", lfmSpike: "lfm",
+  interference: "interference", duplicate: "rpd",
+};
+
+/** Deep-clone a criteria object so parsing never mutates the frozen default. */
+function cloneCriteria(c) {
+  return {
+    trueValues: { ...c.trueValues },
+    ranges: Object.fromEntries(Object.entries(c.ranges).map(([k, v]) => [k, [...v]])),
+    rangeInfo: Object.fromEntries(Object.entries(c.rangeInfo || {}).map(([k, v]) => [k, { ...v }])),
+    matrixBlank: { ...c.matrixBlank },
+    lfmSpikeMinMatrix: c.lfmSpikeMinMatrix,
+    elementOverrides: (c.elementOverrides || []).map((o) => ({ ...o })),
+    citations: { ...(c.citations || {}) },
+  };
+}
+
+/** Set a QC true value + its Hg (µg/L) element override from a CODES amount row. */
+function setAmount(out, trueKey, metals, hg) {
+  if (metals !== null) out.trueValues[trueKey] = metals;
+  if (hg !== null) {
+    out.elementOverrides = out.elementOverrides.filter((o) => !(o.trueKey === trueKey && o.match === "^Hg "));
+    out.elementOverrides.push({ match: "^Hg ", trueKey, value: hg });
+  }
+}
+
+/**
+ * Read the QC acceptance criteria straight from a loaded workbook's CODES sheet
+ * ("PERCENT RECOVERIES" table + spike-amount table), so the live workbook values
+ * — ranges, ± tolerances, SOP citations, true values, the LRB matrix/RL rule —
+ * always win over the encoded defaults. Returns a full criteria object, or null
+ * if the workbook has no recognisable CODES table (caller falls back to default).
+ */
+export function parseQcCriteria(wb) {
+  const ws = wb?.getWorksheet?.("CODES");
+  if (!ws) return null;
+  const num = (v) => toNumber(cellValue(v));
+  const text = (v) => String(cellValue(v) ?? "").trim();
+
+  let head = null;
+  for (let r = 1; r <= 80; r += 1) {
+    if (/PERCENT RECOVERIES/i.test(text(ws.getCell(r, 1).value))) { head = r; break; }
+  }
+  if (head === null) return null;
+
+  const out = cloneCriteria(DEFAULT_QC_CRITERIA);
+  // Recovery ranges: A=role, B=± tolerance (or text), C=low%, D=high%, E=citation.
+  for (let r = head + 1; r <= head + 16; r += 1) {
+    const label = text(ws.getCell(r, 1).value);
+    const key = label ? roleKey(label) : null;
+    if (!key) continue;
+    const tol = num(ws.getCell(r, 2).value);
+    const lo = num(ws.getCell(r, 3).value);
+    const hi = num(ws.getCell(r, 4).value);
+    const citation = text(ws.getCell(r, 5).value).replace(/^<--\s*/, "");
+    if (key === "lrb") {
+      if (lo !== null) out.matrixBlank.matrixPct = lo;
+      if (hi !== null) out.matrixBlank.rlMultiple = hi;
+      const rule = text(ws.getCell(r, 2).value);
+      if (rule) out.matrixBlank.rule = rule;
+      if (citation) out.matrixBlank.citation = citation;
+      continue;
+    }
+    if (key === "ipcBlank") { if (citation) out.citations.ipcBlank = citation; continue; }
+    const cat = RANGE_CATEGORY[key];
+    if (!cat) continue;
+    if (cat === "rpd") {
+      if (tol !== null) out.ranges.rpd = [0, tol];
+      out.rangeInfo.rpd = { tolerance: tol, citation };
+    } else if (lo !== null && hi !== null) {
+      out.ranges[cat] = [lo, hi];
+      out.rangeInfo[cat] = { tolerance: tol, citation };
+    }
+  }
+  // Spike / CCV / ICV amounts: A=label, B=all metals (mg/L), C=Hg (µg/L).
+  for (let r = head; r <= head + 30; r += 1) {
+    const label = text(ws.getCell(r, 1).value);
+    if (!label) continue;
+    const metals = num(ws.getCell(r, 2).value);
+    const hg = num(ws.getCell(r, 3).value);
+    if (/SPIKE AMOUNT/i.test(label)) setAmount(out, "spike", metals, hg);
+    else if (/CCV5?\s*Amount/i.test(label)) setAmount(out, "ccv", metals, hg);
+    else if (/ICV\s*Amount/i.test(label)) setAmount(out, "icv", metals, hg);
+  }
+  return out;
 }
 
 // ---- equations -------------------------------------------------------------
@@ -123,6 +235,31 @@ export function rpd(r1, r2) {
 export function classify(value, range) {
   if (value === null || !range) return "n/a";
   return value >= range[0] && value <= range[1] ? "PASS" : "FAIL";
+}
+
+/**
+ * Acceptability verdict for a FAILED digest blank — BATCH rows 106 ("Comparison to
+ * Sample Matrix") and 107 ("Comparison to 2.2X RL"). A blank above the RL is still
+ * acceptable if it's < matrixPct% of the sample matrix OR < rlMultiple × the RL.
+ * Returns the two workbook verdicts verbatim plus a combined acceptability flag.
+ */
+export function matrixBlankVerdict(blankValue, sampleValue, rl, mb = DEFAULT_QC_CRITERIA.matrixBlank) {
+  const matrixOk = typeof sampleValue === "number" && sampleValue > 0 && (blankValue / sampleValue) * 100 < mb.matrixPct;
+  const rlOk = typeof rl === "number" && rl > 0 && blankValue < mb.rlMultiple * rl;
+  const matrixVerdict = typeof sampleValue === "number" && sampleValue > 0 ? (matrixOk ? `<${mb.matrixPct}% Matrix` : `>${mb.matrixPct}% Matrix`) : null;
+  const rlVerdict = typeof rl === "number" && rl > 0 ? (rlOk ? `<${mb.rlMultiple}X RL` : `>${mb.rlMultiple}X RL`) : null;
+  const acceptable = matrixOk || rlOk;
+  const note = [matrixVerdict, rlVerdict].filter(Boolean).join(" · ") + (acceptable ? " — acceptable" : "");
+  return { acceptable, matrixVerdict, rlVerdict, note };
+}
+
+/**
+ * LFM spike recovery is uninterpretable when the spike added is < minFraction of
+ * the sample's own background (the matrix dominates) — BATCH row 102's
+ * "Spike < 30% of Sample Matrix" branch. True iff it should be flagged.
+ */
+export function spikeBelowMatrix(spikeTrue, sampleBackground, minFraction = DEFAULT_QC_CRITERIA.lfmSpikeMinMatrix) {
+  return typeof sampleBackground === "number" && sampleBackground > 0 && spikeTrue / sampleBackground < minFraction;
 }
 
 // ---- the check -------------------------------------------------------------
@@ -184,17 +321,32 @@ export function runQcCheck(qcModel, rawUnadjusted, criteria = DEFAULT_QC_CRITERI
       let metric = null;
       let unit = null;
       let status = "n/a";
+      let note = null;
       if (def.kind === "blank") {
         status = blankPassFail(m.reportable, a.belowLabel);
+        // A failed digest blank can still be acceptable if it's <10% of the sample
+        // matrix OR < 2.2×RL (the CODES "<RL or up to 10% of matrix or 2.2X RL" rule).
+        if (def.matrixComparison && status === "FAIL") {
+          const sample = measuredByKey.get("sample")?.[a.key]?.calcValue;
+          note = matrixBlankVerdict(m.calcValue, sample, a.detectionLimit, criteria.matrixBlank).note;
+        }
       } else if (def.kind === "recovery") {
         metric = recovery(m.calcValue, trueValueFor(a.label, def.trueKey, criteria));
         unit = "%recovery";
         status = classify(metric, criteria.ranges[def.range]);
       } else if (def.kind === "correctedRecovery") {
         const blank = measuredByKey.get(def.blankKey)?.[a.key]?.calcValue ?? 0;
-        metric = correctedRecovery(m.calcValue, blank, trueValueFor(a.label, def.trueKey, criteria));
-        unit = "%recovery";
-        status = classify(metric, criteria.ranges[def.range]);
+        const trueValue = trueValueFor(a.label, def.trueKey, criteria);
+        // LFM spike recovery is uninterpretable when the spike is < 30% of the
+        // sample background (the matrix dominates) — flag instead of reporting %.
+        if (def.spikeMatrixCheck && spikeBelowMatrix(trueValue, blank, criteria.lfmSpikeMinMatrix)) {
+          unit = "Spike < 30% of Sample Matrix";
+          note = "spike < 30% of sample background — recovery not meaningful";
+        } else {
+          metric = correctedRecovery(m.calcValue, blank, trueValue);
+          unit = "%recovery";
+          status = classify(metric, criteria.ranges[def.range]);
+        }
       } else if (def.kind === "rpd") {
         const other = measuredByKey.get(def.pairKey)?.[a.key];
         const r = rpd(other?.calcValue, m.calcValue);
@@ -202,7 +354,7 @@ export function runQcCheck(qcModel, rawUnadjusted, criteria = DEFAULT_QC_CRITERI
         unit = r.note || "%RPD";
         status = r.value === null ? "PASS" : classify(r.value, criteria.ranges[def.range]);
       }
-      results.push({ analyte: a.label, reportable: m.reportable, metric, unit, status });
+      results.push({ analyte: a.label, reportable: m.reportable, metric, unit, status, note });
       if (status === "PASS") pass += 1;
       else if (status === "FAIL") fail += 1;
     }
