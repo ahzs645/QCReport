@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import DropZone from "../components/DropZone.jsx";
 import QcPanel from "../components/QcPanel.jsx";
 import ResultsPreview from "../components/ResultsPreview.jsx";
+import ReportFields from "../components/ReportFields.jsx";
 import DownloadBar from "../components/DownloadBar.jsx";
 import { analyze } from "../core/pipeline.js";
 
@@ -9,12 +10,17 @@ export default function QcResultsView() {
   const [status, setStatus] = useState("idle");
   const [analysis, setAnalysis] = useState(null);
   const [error, setError] = useState(null);
+  const [header, setHeader] = useState({});
+  const [sampleNames, setSampleNames] = useState({});
 
   async function handleFiles(files) {
     setStatus("working");
     setError(null);
     try {
-      setAnalysis(await analyze(files));
+      const result = await analyze(files);
+      setAnalysis(result);
+      setHeader({}); // reset per-run fields for the new drop
+      setSampleNames({});
       setStatus("ready");
     } catch (e) {
       setError(e.message || String(e));
@@ -38,7 +44,14 @@ export default function QcResultsView() {
             <span><b>Samples:</b> {analysis.samples.length}</span>
             <span><b>QC roles:</b> {analysis.sources.qcRoleSource}</span>
           </section>
-          <DownloadBar analysis={analysis} />
+          <ReportFields
+            header={header}
+            onHeader={(k, v) => setHeader((h) => ({ ...h, [k]: v }))}
+            samples={analysis.samples}
+            sampleNames={sampleNames}
+            onSampleName={(id, v) => setSampleNames((s) => ({ ...s, [id]: v }))}
+          />
+          <DownloadBar analysis={analysis} overrides={{ header, sampleNames }} />
           <QcPanel qc={analysis.qc} reportableAnalytes={analysis.reportableAnalytes} />
           <ResultsPreview matrix={analysis.reportMatrix} samples={analysis.samples} />
         </>

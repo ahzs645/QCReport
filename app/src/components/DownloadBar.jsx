@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { downloadQc, downloadResults } from "../core/pipeline.js";
 
-export default function DownloadBar({ analysis }) {
+export default function DownloadBar({ analysis, overrides = {} }) {
   const [busy, setBusy] = useState(null);
 
   const run = async (which, fn, name) => {
     setBusy(which);
     try {
-      await fn(analysis, name);
+      await fn(analysis, overrides, name);
     } catch (e) {
       alert(`Could not generate ${which}: ${e.message || e}`);
     } finally {

@@ -80,6 +80,18 @@ h2 { font-size: 17px; margin: 28px 0 10px; }
 .meta { display: flex; flex-wrap: wrap; gap: 18px; margin: 18px 0; color: var(--muted); font-size: 13px; }
 .meta b { color: var(--text); }
 
+.report-fields { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin: 16px 0; }
+.report-fields h2 { margin: 0 0 12px; }
+.report-fields h3 { font-size: 14px; margin: 16px 0 8px; }
+.rf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 16px; }
+.rf-samples { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px 16px; }
+.report-fields label { display: flex; flex-direction: column; font-size: 12px; color: var(--muted); gap: 3px; }
+.report-fields label span { font-weight: 600; color: var(--text); }
+.report-fields .sid { font-weight: 400; font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--muted); }
+.rf-samples label { flex-direction: row; align-items: center; gap: 8px; }
+.rf-samples .sid { flex: 0 0 150px; }
+.report-fields input { padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; flex: 1; }
+
 .downloadbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 8px 0 4px; }
 .downloadbar button {
   background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 10px 16px;

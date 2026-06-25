@@ -170,6 +170,17 @@ export async function scrubUnusedSharedStrings(zip) {
   return zip;
 }
 
+/** Blank author/editor names in docProps/core.xml (document metadata). Mutates zip. */
+export async function scrubDocProps(zip) {
+  const f = zip.file("docProps/core.xml");
+  if (!f) return zip;
+  const xml = (await f.async("string"))
+    .replace(/<dc:creator>[\s\S]*?<\/dc:creator>/g, "<dc:creator></dc:creator>")
+    .replace(/<cp:lastModifiedBy>[\s\S]*?<\/cp:lastModifiedBy>/g, "<cp:lastModifiedBy></cp:lastModifiedBy>");
+  zip.file("docProps/core.xml", xml);
+  return zip;
+}
+
 /** Group flat dataset cells [{sheet,ref,value}] into { sheet: [{ref,value}] }. */
 export function groupCellsBySheet(cells) {
   const out = {};

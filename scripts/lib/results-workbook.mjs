@@ -54,6 +54,39 @@ export async function loadWorkbook(arrayBuffer) {
   return wb;
 }
 
+// Editable report header fields (col-A label -> the value cell to its right in col B).
+// "perRun" fields vary per report (and are scrubbed from blank templates + entered
+// in the app); "constant" fields (lab director, DL file) are stable defaults.
+export const HEADER_FIELDS = [
+  { key: "analyst", label: "Analyst", match: /^analyst/i, perRun: true },
+  { key: "nalsDirector", label: "NALS Director", match: /^nals director/i, perRun: false },
+  { key: "date", label: "Date", match: /^date/i, perRun: true },
+  { key: "clientName", label: "Client Name", match: /^client name/i, perRun: true },
+  { key: "supervisor", label: "Supervisor", match: /^supervisor/i, perRun: true },
+  { key: "clientCompany", label: "Client Company Name", match: /^client company/i, perRun: true },
+  { key: "referenceFile", label: "Reference File", match: /^reference file/i, perRun: true },
+  { key: "numberOfSamples", label: "Number of Samples", match: /^number of samples/i, perRun: true },
+  { key: "detectionLimitsFile", label: "Detection Limits File", match: /^detection limits file/i, perRun: false },
+];
+
+/**
+ * Locate the header value cells in a sheet by scanning column A for the known
+ * labels. Returns { key: "B5", … } for whichever fields are present.
+ */
+export function findHeaderFields(wb, sheetName) {
+  const ws = wb.getWorksheet(sheetName);
+  if (!ws) return {};
+  const refs = {};
+  for (let r = 1; r <= 24; r += 1) {
+    const label = cellText(ws.getCell(`A${r}`).value);
+    if (!label) continue;
+    for (const f of HEADER_FIELDS) {
+      if (!refs[f.key] && f.match.test(label)) refs[f.key] = `B${r}`;
+    }
+  }
+  return refs;
+}
+
 /** Workbook template version, from INSTRUCTIONS!A3 (falls back to CODES!A2 cached). */
 export function getVersion(wb) {
   const instr = wb.getWorksheet("INSTRUCTIONS");

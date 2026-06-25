@@ -4,7 +4,7 @@
 // injection into the pristine template XML (exceljs cannot round-trip the dynamic
 // arrays / metadata.xml without corrupting the file).
 
-import { buildSpec, getClientSamples, loadWorkbook } from "../../../scripts/lib/results-workbook.mjs";
+import { buildSpec, findHeaderFields, getClientSamples, loadWorkbook } from "../../../scripts/lib/results-workbook.mjs";
 import { parseIcpoesConcWorkbook } from "../../../scripts/lib/raw-parsers/icpoes-conc.mjs";
 import { ingestQcBatch, parseQcBatch } from "../../../scripts/lib/qc-batch.mjs";
 import { ingestIcpoes } from "../../../scripts/lib/ingest.mjs";
@@ -86,6 +86,7 @@ export async function analyze(files) {
     reportMatrix,
     qc,
     reportableAnalytes: [...reportableAnalyteKeys(spec)],
+    resultsHeaderRefs: findHeaderFields(specWb, "ICPOES RESULTS"),
     // retained for downloads
     _conc: conc,
     _unadj: unadj,
@@ -112,17 +113,33 @@ async function injectAndDownload(templateUrl, cells, filename) {
   URL.revokeObjectURL(url);
 }
 
-/** Generate the populated RESULTS workbook (live formulas) and download it. */
-export async function downloadResults(analysis, filename = "RESULTS-from-raw.xlsx") {
-  await injectAndDownload(RESULTS_TPL, analysis._ingestCells, filename);
+/** Header field values -> cells for a target sheet, using located refs. */
+function headerCells(sheet, refs, header = {}) {
+  return Object.entries(header)
+    .filter(([key, value]) => refs[key] && value != null && String(value).trim() !== "")
+    .map(([key, value]) => ({ sheet, ref: refs[key], value: String(value) }));
 }
 
-/** Generate the populated QC (QA/QC) workbook (live formulas) and download it. */
-export async function downloadQc(analysis, filename = "QC-from-raw.xlsx") {
-  // Parse the (pristine) QC template to map QC roles, ingest from the raw Unadjusted
-  // data, then surgically inject the green cells.
+/**
+ * Generate the populated RESULTS workbook and download it.
+ * @param {object} overrides - { sampleNames: {id: name}, header: {key: value} }
+ */
+export async function downloadResults(analysis, overrides = {}, filename = "RESULTS-from-raw.xlsx") {
+  const { sampleNames = {}, header = {} } = overrides;
+  const oes = analysis._spec.instrumentSheets["ICPOES RESULTS"];
+  // Re-ingest with any edited friendly sample names (fills ICPOES column A).
+  const samples = analysis.samples.map((s) => ({ ...s, name: sampleNames[s.id] ?? s.name }));
+  const { cells } = ingestIcpoes(analysis._conc, { samples, analytes: oes.analytes, inputBandStart: oes.inputRows.start });
+  const cellsOut = [...cells, ...headerCells("ICPOES RESULTS", analysis.resultsHeaderRefs || {}, header)];
+  await injectAndDownload(RESULTS_TPL, cellsOut, filename);
+}
+
+/** Generate the populated QC (QA/QC) workbook and download it. */
+export async function downloadQc(analysis, overrides = {}, filename = "QC-from-raw.xlsx") {
+  const { header = {} } = overrides;
   const qcWb = await loadWorkbook(await fetchBuffer(QC_TPL));
   const qcModel = parseQcBatch(qcWb);
   const { cells } = ingestQcBatch(qcModel, analysis._unadj);
-  await injectAndDownload(QC_TPL, cells, filename);
+  const cellsOut = [...cells, ...headerCells("BATCH", findHeaderFields(qcWb, "BATCH"), header)];
+  await injectAndDownload(QC_TPL, cellsOut, filename);
 }
