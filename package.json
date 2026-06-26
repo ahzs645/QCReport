@@ -1,10 +1,24 @@
 {
-  "name": "water-report-manager",
+  "name": "qcreport",
   "version": "0.1.0",
   "description": "NALS (UNBC) water analysis pipeline: re-export the RESULTS calculation workbook and recreate it from raw instrument exports.",
   "type": "module",
   "license": "UNLICENSED",
   "private": true,
+  "exports": {
+    ".": {
+      "types": "./engine/index.d.ts",
+      "default": "./engine/index.mjs"
+    },
+    "./assets": "./engine/assets.mjs",
+    "./templates/*": "./templates/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "engine",
+    "scripts/lib",
+    "templates"
+  ],
   "scripts": {
     "extract:template": "node scripts/extract-template.mjs",
     "build:templates": "node scripts/build-templates.mjs",
