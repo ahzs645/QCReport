@@ -2,9 +2,9 @@
 // data CONTRACT a host's data-prep must satisfy — import them to keep your
 // bridge's output shape aligned with what the components render.
 import type { ReactElement } from "react";
-import type { ReportMatrixRow } from "qcreport";
+import type { ControlPoint, ControlSeries, ReportMatrixRow } from "qcreport";
 
-export type { ReportMatrixRow };
+export type { ReportMatrixRow, ControlSeries, ControlPoint };
 
 /** PASS / FAIL / NA (the engine may emit other free-text statuses). */
 export type QcStatus = "PASS" | "FAIL" | "NA" | string;
@@ -67,3 +67,11 @@ export function QcPanel(props: { qc: QcChecks; reportableAnalytes?: string[] }):
 export function ResultsPreview(props: { matrix: ReportMatrixRow[]; samples: SampleLite[] }): ReactElement | null;
 export function AdjUnadjPanel(props: { rows: AdjUnadjRow[]; reportableAnalytes?: string[] }): ReactElement | null;
 export function RackView(props: { entries: PrepEntryView[] }): ReactElement | null;
+export function ControlChart(props: { series: ControlSeries; title?: string; showLine?: boolean }): ReactElement | null;
+export function ControlChartSvg(props: {
+  series: ControlSeries;
+  points: Array<ControlPoint & { id: number }>;
+  showLine?: boolean;
+  selected: number | null;
+  onSelect: (id: number) => void;
+}): ReactElement | null;

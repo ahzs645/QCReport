@@ -277,6 +277,66 @@
   border-top: 1px solid var(--qc-border);
 }
 
+/* ---- control chart ---- */
+.qcreport-ui .control-chart {
+  background: var(--qc-card);
+  border: 1px solid var(--qc-border);
+  border-radius: var(--qc-radius);
+  padding: 14px 16px;
+}
+.qcreport-ui .control-chart h3 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  color: var(--qc-strong);
+}
+.qcreport-ui .cc-top {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.qcreport-ui .cc-top > svg {
+  flex: 1 1 560px;
+  min-width: 320px;
+  max-width: 100%;
+}
+.qcreport-ui .cc-side {
+  flex: 0 0 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.74rem;
+}
+.qcreport-ui .cc-side > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 0;
+  color: var(--qc-muted);
+}
+.qcreport-ui .cc-side > div b {
+  color: var(--qc-strong);
+  font-family: var(--qc-mono);
+}
+.qcreport-ui .cc-side .sep {
+  margin-top: 6px;
+  border-top: 1px solid var(--qc-border);
+  padding-top: 6px;
+}
+.qcreport-ui .cc-tablehint {
+  margin: 10px 0 4px;
+}
+.qcreport-ui .cc-table-scroll {
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid var(--qc-border);
+  border-radius: var(--qc-radius-sm);
+}
+.qcreport-ui .cc-table .row-selected {
+  background: var(--qc-pass-bg);
+  box-shadow: inset 2px 0 0 var(--qc-accent);
+}
+
 /* ---- rack / prep layout ---- */
 .qcreport-ui .rack-grid {
   display: flex;

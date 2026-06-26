@@ -14,3 +14,5 @@ export { QcPanel } from "./QcPanel.jsx";
 export { ResultsPreview } from "./ResultsPreview.jsx";
 export { AdjUnadjPanel } from "./AdjUnadjPanel.jsx";
 export { RackView } from "./RackView.jsx";
+export { ControlChart } from "./ControlChart.jsx";
+export { ControlChartSvg } from "./ControlChartSvg.jsx";
