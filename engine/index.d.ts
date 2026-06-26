@@ -143,6 +143,75 @@ export const DEFAULT_QC_CRITERIA: Readonly<Record<string, unknown>>;
 export function parseQcCriteria(wb: Workbook): Record<string, unknown> | null;
 export function runQcCheck(qcModel: unknown, rawUnadjusted: ParsedContract, criteria: unknown): QcResult;
 
+// ---- QC view model (the data contract for the qcreport/ui components) --------
+/** PASS / FAIL / NA (the engine may emit other free-text statuses). */
+export type QcStatus = "PASS" | "FAIL" | "NA" | string;
+/** One analyte's result under a single QC check. */
+export interface QcCheckResultView {
+  analyte: string;
+  /** Normalized analyte label — used by the "reportable only" filter. */
+  norm: string;
+  reportable: number | string | boolean;
+  metric: number | null;
+  unit?: string;
+  status: QcStatus;
+  note?: string;
+}
+/** A QC check (a role × kind), e.g. Digest LFB recovery, or Duplicate RPD. */
+export interface QcCheckView {
+  key: string;
+  role: string;
+  /** "blank" | "rpd" | "recovery" (the engine may add others). */
+  kind: string;
+  results: QcCheckResultView[];
+}
+export interface QcChecks {
+  checks: QcCheckView[];
+}
+/** One row of the adjusted-vs-unadjusted dilution comparison. */
+export interface AdjUnadjRow {
+  id: string;
+  sample: string;
+  analyte: string;
+  adjusted: number | string | null;
+  unadjusted: number | string | null;
+  diff: number | null;
+  ratio: number | null;
+}
+/** A prep/rack cross-reference entry (HotBlock digestion / Labels workbook). */
+export interface PrepEntryView {
+  key: string;
+  id: string;
+  sampleName?: string;
+  prepRole?: string;
+  position?: string | number;
+  rack?: { column: number; row: number } | null;
+  amount?: string | number | null;
+  acid?: string;
+  comments?: string;
+}
+export interface SampleLite {
+  id: string;
+  name: string;
+}
+/** Everything the QC views render, flattened to plain data. buildQcViewModel output. */
+export interface QcViewModel {
+  sources: Record<string, string | null>;
+  version: string;
+  samples: SampleLite[];
+  checks: QcCheckView[];
+  reportableAnalytes: string[];
+  matrix: ReportMatrixRow[];
+  adjUnadj: AdjUnadjRow[];
+  prepEntries: PrepEntryView[];
+  qcRoleHints: Array<{ id: string; role: string; name: string }>;
+  /** Human-readable prep warnings (already formatted). */
+  prepWarnings: string[];
+  /** Pass/fail totals across all checks. */
+  summary: { pass: number; fail: number };
+}
+export function buildQcViewModel(analysis: BatchAnalysis): QcViewModel;
+
 // Ingest + Excel injection.
 export interface IngestResult {
   cells: Array<{ sheet: string; ref: string; value: unknown }>;

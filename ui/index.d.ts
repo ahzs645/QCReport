@@ -1,67 +1,32 @@
-// Types for the qcreport/ui presentational components. These also define the
-// data CONTRACT a host's data-prep must satisfy — import them to keep your
-// bridge's output shape aligned with what the components render.
+// Types for the qcreport/ui presentational components. The data shapes (the
+// CONTRACT a host's data-prep must satisfy) are defined once in the engine
+// (see buildQcViewModel) and re-exported here for convenience.
 import type { ReactElement } from "react";
-import type { ControlPoint, ControlSeries, ReportMatrixRow } from "qcreport";
+import type {
+  AdjUnadjRow,
+  ControlPoint,
+  ControlSeries,
+  PrepEntryView,
+  QcChecks,
+  QcCheckResultView,
+  QcCheckView,
+  QcStatus,
+  ReportMatrixRow,
+  SampleLite,
+} from "qcreport";
 
-export type { ReportMatrixRow, ControlSeries, ControlPoint };
-
-/** PASS / FAIL / NA (the engine may emit other free-text statuses). */
-export type QcStatus = "PASS" | "FAIL" | "NA" | string;
-
-/** One analyte's result under a single QC check. */
-export interface QcCheckResultView {
-  analyte: string;
-  /** Normalized analyte label — used by the "reportable only" filter. */
-  norm: string;
-  reportable: number | string | boolean;
-  metric: number | null;
-  unit?: string;
-  status: QcStatus;
-  note?: string;
-}
-
-/** A QC check (a role × kind), e.g. Digest LFB recovery, or Duplicate RPD. */
-export interface QcCheckView {
-  key: string;
-  role: string;
-  /** "blank" | "rpd" | "recovery" (the engine may add others). */
-  kind: string;
-  results: QcCheckResultView[];
-}
-
-export interface QcChecks {
-  checks: QcCheckView[];
-}
-
-/** One row of the adjusted-vs-unadjusted dilution comparison. */
-export interface AdjUnadjRow {
-  id: string;
-  sample: string;
-  analyte: string;
-  adjusted: number | string | null;
-  unadjusted: number | string | null;
-  diff: number | null;
-  ratio: number | null;
-}
-
-/** A prep/rack cross-reference entry (HotBlock digestion / Labels workbook). */
-export interface PrepEntryView {
-  key: string;
-  id: string;
-  sampleName?: string;
-  prepRole?: string;
-  position?: string | number;
-  rack?: { column: number; row: number } | null;
-  amount?: string | number | null;
-  acid?: string;
-  comments?: string;
-}
-
-export interface SampleLite {
-  id: string;
-  name: string;
-}
+export type {
+  AdjUnadjRow,
+  ControlPoint,
+  ControlSeries,
+  PrepEntryView,
+  QcChecks,
+  QcCheckResultView,
+  QcCheckView,
+  QcStatus,
+  ReportMatrixRow,
+  SampleLite,
+};
 
 export function QcPanel(props: { qc: QcChecks; reportableAnalytes?: string[] }): ReactElement | null;
 export function ResultsPreview(props: { matrix: ReportMatrixRow[]; samples: SampleLite[] }): ReactElement | null;

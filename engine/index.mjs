@@ -30,6 +30,10 @@ export { reportableValue, hardnessAsCaCO3, roundSignificant, roundDecimals, valu
 // Quality-check engine.
 export { runQcCheck, parseQcCriteria, DEFAULT_QC_CRITERIA } from "../scripts/lib/qc-engine.mjs";
 
+// View-model shaper: BatchAnalysis -> the plain props the qcreport/ui components
+// render (single source of truth for the analysis->props shaping).
+export { buildQcViewModel } from "../scripts/lib/qc-viewmodel.mjs";
+
 // Ingest (parsed raw -> workbook cells) for the Excel-regen path.
 export { ingestInstrument, ingestIcpoes, ingestIc } from "../scripts/lib/ingest.mjs";
 export { parseQcBatch, ingestQcBatch } from "../scripts/lib/qc-batch.mjs";

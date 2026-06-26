@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import DropZone from "../components/DropZone.jsx";
-import QcPanel from "../components/QcPanel.jsx";
-import ResultsPreview from "../components/ResultsPreview.jsx";
+import { QcPanel, ResultsPreview, AdjUnadjPanel, RackView } from "../../../ui/index.mjs";
 import ReportFields from "../components/ReportFields.jsx";
 import DownloadBar from "../components/DownloadBar.jsx";
-import AdjUnadjPanel from "../components/AdjUnadjPanel.jsx";
-import RackView from "../components/RackView.jsx";
 import { analyze } from "../core/pipeline.js";
+import { buildQcViewModel } from "../../../scripts/lib/qc-viewmodel.mjs";
 
 export default function QcResultsView() {
   const [status, setStatus] = useState("idle");
@@ -16,6 +14,9 @@ export default function QcResultsView() {
   const [sampleNames, setSampleNames] = useState({});
   const [showAdjUnadj, setShowAdjUnadj] = useState(false);
   const [showRack, setShowRack] = useState(false);
+
+  // Shape the analysis into the qcreport/ui component props (single source of truth).
+  const vm = useMemo(() => (analysis ? buildQcViewModel(analysis) : null), [analysis]);
 
   async function handleFiles(files) {
     setStatus("working");
@@ -78,7 +79,7 @@ export default function QcResultsView() {
             onSampleName={(id, v) => setSampleNames((s) => ({ ...s, [id]: v }))}
           />
           <DownloadBar analysis={analysis} overrides={{ header, sampleNames }} />
-          <QcPanel qc={analysis.qc} reportableAnalytes={analysis.reportableAnalytes} />
+          <QcPanel qc={vm} reportableAnalytes={vm.reportableAnalytes} />
           {analysis.qcRoleHints?.length > 0 && (
             <p className="hint" style={{ marginTop: 6 }}>
               QC/prep roles cross-referenced from HotBlock:{" "}
@@ -93,14 +94,7 @@ export default function QcResultsView() {
                 <input type="checkbox" checked={showAdjUnadj} onChange={(e) => setShowAdjUnadj(e.target.checked)} /> show comparison
               </label>
             </h2>
-            {showAdjUnadj && (
-              <AdjUnadjPanel
-                adjusted={analysis._conc}
-                unadjusted={analysis._unadj}
-                samples={analysis.samples}
-                reportableAnalytes={analysis.reportableAnalytes}
-              />
-            )}
+            {showAdjUnadj && <AdjUnadjPanel rows={vm.adjUnadj} reportableAnalytes={vm.reportableAnalytes} />}
           </section>
 
           <section>
@@ -111,10 +105,10 @@ export default function QcResultsView() {
                 <input type="checkbox" checked={showRack} onChange={(e) => setShowRack(e.target.checked)} /> show
               </label>
             </h2>
-            {showRack && <RackView prep={analysis.prep} />}
+            {showRack && <RackView entries={vm.prepEntries} />}
           </section>
 
-          <ResultsPreview matrix={analysis.reportMatrix} samples={analysis.samples} />
+          <ResultsPreview matrix={vm.matrix} samples={vm.samples} />
         </>
       )}
     </>
