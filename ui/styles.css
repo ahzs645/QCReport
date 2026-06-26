@@ -1,0 +1,326 @@
+/* =========================================================================
+   qcreport/ui — component styles. All rules are scoped under `.qcreport-ui`
+   (wrap the components in one) so they never clobber host classes, and every
+   colour/spacing token is a `--qc-*` custom property with a sensible default.
+   Theme by overriding the `--qc-*` variables on `.qcreport-ui` (or an ancestor).
+   ========================================================================= */
+
+.qcreport-ui {
+  --qc-card: #ffffff;
+  --qc-card-2: #f3f5f7;
+  --qc-border: #d8dee4;
+  --qc-border-strong: #c2cad1;
+  --qc-text: #1f2328;
+  --qc-strong: #11161b;
+  --qc-muted: #656d76;
+  --qc-faint: #8a929b;
+  --qc-accent: #0b6e4f;
+  --qc-pass: #1a7f37;
+  --qc-pass-bg: #eaf6ec;
+  --qc-fail: #b42318;
+  --qc-fail-bg: #fdeceb;
+  --qc-warn: #9a6700;
+  --qc-warn-bg: #fff8e6;
+  --qc-section-bg: #eef2f5;
+  --qc-radius: 7px;
+  --qc-radius-sm: 4px;
+  --qc-mono: ui-monospace, "SFMono-Regular", "IBM Plex Mono", monospace;
+
+  color: var(--qc-text);
+}
+
+/* ---- section shell ---- */
+.qcreport-ui .qc-section {
+  background: var(--qc-card);
+  border: 1px solid var(--qc-border);
+  border-radius: var(--qc-radius);
+  padding: 14px 16px;
+}
+.qcreport-ui .qc-section > h2 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  color: var(--qc-strong);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.qcreport-ui .hint {
+  color: var(--qc-muted);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+/* ---- shared controls ---- */
+.qcreport-ui .toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--qc-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.qcreport-ui .toggle input {
+  accent-color: var(--qc-accent);
+}
+.qcreport-ui .summary-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.qcreport-ui .summary-pill.pass {
+  background: var(--qc-pass-bg);
+  color: var(--qc-pass);
+}
+.qcreport-ui .summary-pill.fail {
+  background: var(--qc-fail-bg);
+  color: var(--qc-fail);
+}
+.qcreport-ui .perf-pass {
+  color: var(--qc-pass);
+}
+.qcreport-ui .perf-fail {
+  color: var(--qc-fail);
+  font-weight: 600;
+}
+
+.qcreport-ui .qc-modebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.qcreport-ui .qc-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.qcreport-ui .seg {
+  display: inline-flex;
+  border: 1px solid var(--qc-border-strong);
+  border-radius: var(--qc-radius-sm);
+  overflow: hidden;
+}
+.qcreport-ui .seg button {
+  border: 0;
+  background: var(--qc-card);
+  color: var(--qc-muted);
+  padding: 3px 11px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.qcreport-ui .seg button + button {
+  border-left: 1px solid var(--qc-border-strong);
+}
+.qcreport-ui .seg button.on {
+  background: var(--qc-accent);
+  color: #fff;
+}
+
+/* ---- QC cards ---- */
+.qcreport-ui .qc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+.qcreport-ui .qc-card {
+  border: 1px solid var(--qc-border);
+  border-left: 3px solid var(--qc-accent);
+  border-radius: var(--qc-radius-sm);
+  background: var(--qc-card-2);
+  overflow: hidden;
+}
+.qcreport-ui .qc-card.has-fail {
+  border-left-color: var(--qc-fail);
+}
+.qcreport-ui .qc-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.qcreport-ui .qc-role {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--qc-strong);
+}
+.qcreport-ui .qc-kind {
+  font-size: 0.72rem;
+  color: var(--qc-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.qcreport-ui .qc-badge {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+.qcreport-ui .qc-badge.pass {
+  background: var(--qc-pass-bg);
+  color: var(--qc-pass);
+}
+.qcreport-ui .qc-badge.fail {
+  background: var(--qc-fail-bg);
+  color: var(--qc-fail);
+}
+.qcreport-ui .qc-badge.na {
+  background: var(--qc-section-bg);
+  color: var(--qc-faint);
+}
+.qcreport-ui .qc-fails {
+  margin: 0;
+  padding: 6px 12px 10px 26px;
+  font-size: 0.8rem;
+  color: var(--qc-text);
+}
+.qcreport-ui .qc-fails li {
+  margin: 2px 0;
+}
+.qcreport-ui .fail-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--qc-fail);
+}
+.qcreport-ui .qc-note {
+  color: var(--qc-muted);
+  font-style: italic;
+}
+
+/* ---- tables ---- */
+.qcreport-ui .qc-detail,
+.qcreport-ui .qc-matrix,
+.qcreport-ui .results,
+.qcreport-ui .cc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+.qcreport-ui .qc-detail th,
+.qcreport-ui .qc-matrix th,
+.qcreport-ui .results th,
+.qcreport-ui .cc-table th {
+  position: sticky;
+  top: 0;
+  background: var(--qc-card-2);
+  color: var(--qc-text);
+  font-weight: 600;
+  text-align: left;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--qc-border-strong);
+  white-space: nowrap;
+}
+.qcreport-ui .qc-detail td,
+.qcreport-ui .qc-matrix td,
+.qcreport-ui .results td,
+.qcreport-ui .cc-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--qc-border);
+  color: var(--qc-text);
+}
+.qcreport-ui .qc-matrix td:not(.analyte),
+.qcreport-ui .results .val,
+.qcreport-ui .cc-table td:nth-child(n + 3) {
+  font-family: var(--qc-mono);
+  font-variant-numeric: tabular-nums;
+}
+.qcreport-ui .qc-matrix .analyte,
+.qcreport-ui .results .param {
+  font-weight: 500;
+  color: var(--qc-strong);
+}
+.qcreport-ui .sortable {
+  cursor: pointer;
+}
+.qcreport-ui .sortable:hover {
+  color: var(--qc-accent);
+}
+.qcreport-ui .qc-in {
+  background: var(--qc-pass-bg);
+  color: var(--qc-pass);
+}
+.qcreport-ui .qc-out {
+  background: var(--qc-fail-bg);
+  color: var(--qc-fail);
+  font-weight: 600;
+}
+.qcreport-ui .qc-detail .row-fail,
+.qcreport-ui .cc-table .row-fail {
+  background: var(--qc-fail-bg);
+}
+.qcreport-ui .cc-table .row-diluted {
+  background: var(--qc-warn-bg);
+}
+.qcreport-ui .results .section-row td {
+  background: var(--qc-section-bg);
+  font-weight: 600;
+  color: var(--qc-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 0.72rem;
+}
+.qcreport-ui .table-scroll {
+  max-height: 460px;
+  overflow: auto;
+  border: 1px solid var(--qc-border);
+  border-radius: var(--qc-radius-sm);
+}
+.qcreport-ui .qc-detail {
+  border-top: 1px solid var(--qc-border);
+}
+
+/* ---- rack / prep layout ---- */
+.qcreport-ui .rack-grid {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+.qcreport-ui .rack-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+}
+.qcreport-ui .rack-col-head {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--qc-muted);
+  text-align: center;
+}
+.qcreport-ui .rack-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 5px 7px;
+  border: 1px solid var(--qc-border);
+  border-radius: var(--qc-radius-sm);
+  background: var(--qc-card-2);
+  font-size: 0.74rem;
+}
+.qcreport-ui .rack-cell.is-prep {
+  background: var(--qc-warn-bg);
+  border-color: var(--qc-warn);
+}
+.qcreport-ui .rack-pos {
+  font-family: var(--qc-mono);
+  color: var(--qc-faint);
+  font-size: 0.68rem;
+}
+.qcreport-ui .rack-name {
+  font-weight: 600;
+  color: var(--qc-strong);
+}
+.qcreport-ui .rack-role {
+  color: var(--qc-warn);
+  font-size: 0.68rem;
+}

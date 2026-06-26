@@ -11,13 +11,19 @@
       "default": "./engine/index.mjs"
     },
     "./assets": "./engine/assets.mjs",
+    "./ui": {
+      "types": "./ui/index.d.ts",
+      "default": "./ui/index.mjs"
+    },
+    "./ui/styles.css": "./ui/styles.css",
     "./templates/*": "./templates/*",
     "./package.json": "./package.json"
   },
   "files": [
     "engine",
     "scripts/lib",
-    "templates"
+    "templates",
+    "ui"
   ],
   "scripts": {
     "extract:template": "node scripts/extract-template.mjs",
@@ -34,6 +40,14 @@
     "exceljs": "^4.4.0",
     "jszip": "^3.10.1",
     "xlsx": "^0.18.5"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true },
+    "react-dom": { "optional": true }
   },
   "devDependencies": {
     "vitest": "^4.1.2"
