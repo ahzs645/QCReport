@@ -4,7 +4,9 @@
 // app and Classic mode never download the charting library.
 import React from "react";
 import * as Classic from "./EwsCharts.jsx";
-import ControlChartSvg from "./ControlChartSvg.jsx";
+// The classic Shewhart plot is the shared, engine-free component from qcreport/ui
+// (single source of truth); only the "rich" Recharts variant stays app-local.
+import { ControlChartSvg } from "../../../ui/ControlChartSvg.jsx";
 
 export const CHART_STYLES = [
   { id: "rich", label: "Rich" },
