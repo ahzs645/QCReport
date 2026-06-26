@@ -8,9 +8,10 @@
 // templates, so the same logic runs unchanged regardless of where the bytes came
 // from (fetch in the browser, fs in Node).
 
-import { buildSpec, findHeaderFields, getClientSamples } from "./results-workbook.mjs";
+import JSZip from "jszip";
+import { buildSpec, findHeaderFields, getClientSamples, loadWorkbook } from "./results-workbook.mjs";
 import { isIcpoesConcWorkbook, parseIcpoesConcWorkbook } from "./raw-parsers/icpoes-conc.mjs";
-import { buildContract } from "./raw-parsers/icpoes-esws.mjs";
+import { buildContract, extractEsws, isEswsZip } from "./raw-parsers/icpoes-esws.mjs";
 import { isHotBlockWorkbook, isLabelsWorkbook, parseHotBlock, parseLabels, buildIdentityIndex } from "./raw-parsers/sample-prep.mjs";
 import { normalizeSampleId } from "./raw-parsers/normalize.mjs";
 import { ingestQcBatch, parseQcBatch } from "./qc-batch.mjs";
@@ -58,6 +59,42 @@ export function applyIdentity(samples, index, { fromResults }) {
   // Re-number sequentially so excluded prep rows don't leave gaps in the output
   // band (samples from a RESULTS workbook carry an explicit row and ignore index).
   return { samples: out.map((s, index) => ({ ...s, index })), warnings };
+}
+
+/**
+ * Turn raw file bytes into the `drops` / `rawEsws` inputs `analyzeBatch` expects.
+ * An ICP Expert `.esws` is a ZIP of .NET-serialized parts (extracted directly); every
+ * other file is loaded as a workbook. JSZip + exceljs are bundled deps of this package,
+ * so consumers don't need them as direct dependencies.
+ * @param {Array<{name:string, buffer:ArrayBuffer|Uint8Array}>} files
+ */
+export async function loadDrops(files) {
+  const drops = [];
+  let rawEsws = null;
+  for (const f of files) {
+    if (/\.esws$/i.test(f.name)) {
+      const zip = await JSZip.loadAsync(f.buffer);
+      if (isEswsZip(zip)) {
+        rawEsws = { name: f.name, extract: await extractEsws(zip) };
+        continue;
+      }
+    }
+    drops.push({ name: f.name, wb: await loadWorkbook(f.buffer) });
+  }
+  return { drops, rawEsws };
+}
+
+/**
+ * Convenience wrapper: load raw file bytes (loadDrops) and analyze them in one call.
+ * The host supplies the raw file buffers plus loaders for the default blank templates.
+ * @param {object} args
+ * @param {Array<{name:string, buffer:ArrayBuffer|Uint8Array}>} args.files
+ * @param {() => Promise<object>|object} args.loadDefaultResultsWb
+ * @param {() => Promise<object>|object} args.loadDefaultQcWb
+ */
+export async function analyzeFiles({ files, loadDefaultResultsWb, loadDefaultQcWb }) {
+  const { drops, rawEsws } = await loadDrops(files);
+  return analyzeBatch({ drops, rawEsws, loadDefaultResultsWb, loadDefaultQcWb });
 }
 
 /**

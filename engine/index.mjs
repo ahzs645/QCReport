@@ -12,7 +12,7 @@
 //   analysis.reportMatrix -> [{ parameter, units, guideline, section, values: [...] }]
 
 // High-level orchestration.
-export { analyzeBatch, classifyWorkbook, applyIdentity } from "../scripts/lib/analyze.mjs";
+export { analyzeBatch, analyzeFiles, loadDrops, classifyWorkbook, applyIdentity } from "../scripts/lib/analyze.mjs";
 
 // Workbook loading + spec (browser-safe parts only — openWorkbook is excluded).
 export { loadWorkbook, buildSpec, getClientSamples, getSamples, findHeaderFields, clearSampleData } from "../scripts/lib/results-workbook.mjs";

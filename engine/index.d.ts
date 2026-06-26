@@ -74,7 +74,20 @@ export interface AnalyzeBatchArgs {
   loadDefaultQcWb: () => Promise<Workbook> | Workbook;
 }
 
+export interface RawFile {
+  name: string;
+  buffer: ArrayBuffer | Uint8Array;
+}
+
+export interface AnalyzeFilesArgs {
+  files: RawFile[];
+  loadDefaultResultsWb: () => Promise<Workbook> | Workbook;
+  loadDefaultQcWb: () => Promise<Workbook> | Workbook;
+}
+
 export function analyzeBatch(args: AnalyzeBatchArgs): Promise<BatchAnalysis>;
+export function analyzeFiles(args: AnalyzeFilesArgs): Promise<BatchAnalysis>;
+export function loadDrops(files: RawFile[]): Promise<{ drops: Array<{ name: string; wb: Workbook }>; rawEsws: { name: string; extract: unknown } | null }>;
 export function classifyWorkbook(wb: Workbook): string;
 export function applyIdentity(
   samples: EngineSample[],

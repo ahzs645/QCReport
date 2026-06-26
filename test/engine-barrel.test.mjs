@@ -7,7 +7,7 @@ import * as engine from "../engine/index.mjs";
 
 const EXPECTED_EXPORTS = [
   // orchestration
-  "analyzeBatch", "classifyWorkbook", "applyIdentity",
+  "analyzeBatch", "analyzeFiles", "loadDrops", "classifyWorkbook", "applyIdentity",
   // workbook + spec
   "loadWorkbook", "buildSpec", "getClientSamples", "getSamples", "findHeaderFields", "clearSampleData",
   // raw parsers

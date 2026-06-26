@@ -4,13 +4,11 @@
 // injection into the pristine template XML (exceljs cannot round-trip the dynamic
 // arrays / metadata.xml without corrupting the file).
 
-import JSZip from "jszip";
 import { findHeaderFields, loadWorkbook } from "../../../scripts/lib/results-workbook.mjs";
-import { extractEsws, isEswsZip } from "../../../scripts/lib/raw-parsers/icpoes-esws.mjs";
 import { ingestQcBatch, parseQcBatch } from "../../../scripts/lib/qc-batch.mjs";
 import { ingestIcpoes } from "../../../scripts/lib/ingest.mjs";
 import { applyEdits, groupCellsBySheet, loadXlsxZip } from "../../../scripts/lib/xlsx-zip.mjs";
-import { analyzeBatch } from "../../../scripts/lib/analyze.mjs";
+import { analyzeFiles } from "../../../scripts/lib/analyze.mjs";
 
 const BASE = import.meta.env.BASE_URL;
 const RESULTS_TPL = `${BASE}templates/nals-results-template.xlsx`;
@@ -34,22 +32,9 @@ async function fetchBuffer(url) {
  * the bundled blank templates.
  */
 export async function analyze(files) {
-  const drops = [];
-  let rawEsws = null;
-  for (const f of files) {
-    const buf = await fileBuffer(f);
-    // ICP Expert .esws is a ZIP of .NET-serialized parts, not a workbook —
-    // parse it directly (removes the manual "Export to Excel" step).
-    if (/\.esws$/i.test(f.name)) {
-      const zip = await JSZip.loadAsync(buf);
-      if (isEswsZip(zip)) { rawEsws = { name: f.name, extract: await extractEsws(zip) }; continue; }
-    }
-    const wb = await loadWorkbook(buf);
-    drops.push({ name: f.name, wb });
-  }
-  return analyzeBatch({
-    drops,
-    rawEsws,
+  const withBuffers = await Promise.all([...files].map(async (f) => ({ name: f.name, buffer: await fileBuffer(f) })));
+  return analyzeFiles({
+    files: withBuffers,
     loadDefaultResultsWb: async () => loadWorkbook(await fetchBuffer(RESULTS_TPL)),
     loadDefaultQcWb: async () => loadWorkbook(await fetchBuffer(QC_TPL)),
   });
