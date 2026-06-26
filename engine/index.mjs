@@ -42,4 +42,25 @@ export { matchSample, nalsNumber } from "../scripts/lib/sample-match.mjs";
 export { normalizeAnalyteLabel, normalizeSampleId, isDilution, dilutionFactor, baseSampleId, isOverRangeValue } from "../scripts/lib/raw-parsers/normalize.mjs";
 
 // Control charts.
-export { controlStats, controlLimits, pointStatus, rpdFromAccepted, performance, parseControlChartRawData } from "../scripts/lib/control-chart.mjs";
+export {
+  controlStats,
+  controlLimits,
+  pointStatus,
+  rpdFromAccepted,
+  performance,
+  parseControlChartRawData,
+  parsePastedControlData,
+  getChartedElements,
+  buildSeries,
+  CONTROL_CHART_INFO,
+} from "../scripts/lib/control-chart.mjs";
+
+// .esws explorer — lazy per-section extractors over an already-loaded JSZip
+// (run table, calibration curves, QC recovery, per-solution replicates, spectra).
+export {
+  extractCalibration,
+  extractQc,
+  extractSolutionDetail,
+  extractRunInfo,
+  extractSpectra,
+} from "../scripts/lib/raw-parsers/esws-explore.mjs";

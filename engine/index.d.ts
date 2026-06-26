@@ -171,8 +171,63 @@ export function isOverRangeValue(value: unknown): boolean;
 
 // Control charts.
 export function controlStats(values: number[]): { mean: number; std: number; n: number };
-export function controlLimits(mean: number, std: number): unknown;
-export function pointStatus(value: number, limits: unknown): string;
+export interface ControlLimits {
+  center: number;
+  sigma1: { upper: number; lower: number };
+  sigma2: { upper: number; lower: number };
+  sigma3: { upper: number; lower: number };
+  [key: string]: unknown;
+}
+export function controlLimits(mean: number, std: number): ControlLimits;
+export function pointStatus(value: number, limits: ControlLimits | null): string;
 export function rpdFromAccepted(value: number, acceptedValue: number): number;
-export function performance(rpd: number, criterion: unknown): string;
-export function parseControlChartRawData(wb: Workbook): unknown;
+export function performance(rpd: number, criterion: number): string;
+
+/** Parsed RAW DATA history from a ControlChart workbook. */
+export interface ControlRawData {
+  acceptedValue: number;
+  criterion: number;
+  variable: string;
+  year: number | null;
+  elements: Array<{ label: string }>;
+  batches: Array<{ file: string; date: Date | string | null; comment: string | null; values: Record<string, number | null> }>;
+}
+export function parseControlChartRawData(wb: Workbook): ControlRawData;
+export function parsePastedControlData(text: string, opts?: { acceptedValue?: number; criterion?: number; variable?: string }): ControlRawData;
+
+/** Charted elements: a per-element Control Chart/Line sheet's element + chosen wavelength. */
+export function getChartedElements(wb: Workbook): Array<{ name: string; label: string | null }>;
+
+/** One point of a built control-chart series. */
+export interface ControlPoint {
+  file: string;
+  date: Date | string | null;
+  value: number;
+  status: string;
+  rpd: number;
+  performance: string;
+  isNew: boolean;
+}
+export interface ControlSeries {
+  element: string;
+  stats: { mean: number; std: number; n: number };
+  limits: ControlLimits | null;
+  acceptedValue: number;
+  criterion: number;
+  from: Date | string | null;
+  to: Date | string | null;
+  points: ControlPoint[];
+}
+export function buildSeries(
+  rawData: ControlRawData,
+  elementLabel: string,
+  opts?: { from?: Date | string | null; to?: Date | string | null; extraPoints?: Array<{ file: string; date: Date | string | null; value: number }> },
+): ControlSeries;
+export const CONTROL_CHART_INFO: Readonly<Record<string, unknown>>;
+
+// .esws explorer (operate on an already-loaded JSZip instance).
+export function extractCalibration(zip: unknown): Promise<unknown>;
+export function extractQc(zip: unknown, opts?: { reportableKeys?: unknown }): Promise<unknown>;
+export function extractSolutionDetail(zip: unknown, partName: string): Promise<unknown>;
+export function extractRunInfo(zip: unknown): Promise<unknown>;
+export function extractSpectra(zip: unknown, solutionKey: string): Promise<unknown>;
