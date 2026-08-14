@@ -41,9 +41,14 @@ export function dilutionFactor(label) {
   return m ? Number(m[1]) : 1;
 }
 
-/** The base sample id with any "Dil. NX" suffix removed. */
+/**
+ * The base sample id with any "Dil. NX" suffix removed.
+ * The suffix is written both bare ("… B03 Dil. 10X") and after a separator
+ * ("… A05 - Dil. 100X"), so the separator goes with it — otherwise the base id
+ * keeps a trailing "-" and no longer matches its own undiluted run.
+ */
 export function baseSampleId(label) {
-  return String(label ?? "").replace(/\s*dil\.?\s*\d+\s*x\s*$/i, "").trim();
+  return String(label ?? "").replace(/\s*[-–—,]?\s*dil\.?\s*\d+\s*x\s*$/i, "").trim();
 }
 
 /** True if a raw value carries the over-range flag ("… o" or "####"). */
