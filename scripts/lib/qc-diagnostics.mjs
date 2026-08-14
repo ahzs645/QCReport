@@ -584,12 +584,10 @@ export function screenRun(extract, options = {}) {
   const rows = [];
   for (const analyte of extract.analytes) {
     if (keys && !keys.has(analyte.key)) continue;
-    let diagnosis;
-    try {
-      diagnosis = diagnoseAnalyte(extract, analyte.key, options);
-    } catch {
-      continue;
-    }
+    // Deliberately not guarded: an analyte silently missing from a QC screen is
+    // indistinguishable from one that passed, which is the worst way for this to
+    // fail. If diagnoseAnalyte throws, that is a bug and it should surface.
+    const diagnosis = diagnoseAnalyte(extract, analyte.key, options);
     const checks = diagnosis.blocks.flatMap((b) => b.qc);
     if (!checks.length && !diagnosis.samples.length) continue;
     // The recovery furthest from 100% — what the eye is scanning for.
