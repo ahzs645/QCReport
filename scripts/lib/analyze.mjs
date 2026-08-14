@@ -12,6 +12,7 @@ import JSZip from "jszip";
 import { buildSpec, findHeaderFields, getClientSamples, loadWorkbook } from "./results-workbook.mjs";
 import { isIcpoesConcWorkbook, parseIcpoesConcWorkbook } from "./raw-parsers/icpoes-conc.mjs";
 import { buildContract, extractEsws, isEswsZip } from "./raw-parsers/icpoes-esws.mjs";
+import { extractDefinedConcentrations, extractQcDefinitions } from "./raw-parsers/esws-explore.mjs";
 import { isHotBlockWorkbook, isLabelsWorkbook, parseHotBlock, parseLabels, buildIdentityIndex } from "./raw-parsers/sample-prep.mjs";
 import { normalizeSampleId } from "./raw-parsers/normalize.mjs";
 import { ingestQcBatch, parseQcBatch } from "./qc-batch.mjs";
@@ -75,7 +76,17 @@ export async function loadDrops(files) {
     if (/\.esws$/i.test(f.name)) {
       const zip = await JSZip.loadAsync(f.buffer);
       if (isEswsZip(zip)) {
-        rawEsws = { name: f.name, extract: await extractEsws(zip) };
+        // The two method tables are read here, while the zip is open, because the
+        // run diagnostics need them and nothing else keeps the zip alive. Both are
+        // small parts, and only a .esws carries them — a Concentration .xlsx export
+        // has no calibration standards or QC acceptance limits in it, which is why
+        // the diagnostics are .esws-only.
+        rawEsws = {
+          name: f.name,
+          extract: await extractEsws(zip),
+          defined: await extractDefinedConcentrations(zip),
+          qcDefs: await extractQcDefinitions(zip),
+        };
         continue;
       }
     }
@@ -206,6 +217,11 @@ export async function analyzeBatch({ drops = [], rawEsws = null, loadDefaultResu
     },
     reportableAnalytes: [...reportableAnalyteKeys(spec)],
     resultsHeaderRefs: findHeaderFields(specWb, "ICPOES RESULTS"),
+    // Everything screenRun()/diagnoseAnalyte() need, or null when the raw run came
+    // from a Concentration .xlsx (which carries no standards or acceptance limits).
+    diagnostics: rawEsws
+      ? { extract: rawEsws.extract, defined: rawEsws.defined ?? null, qcDefs: rawEsws.qcDefs ?? null }
+      : null,
     // retained for downloads
     _conc: conc,
     _unadj: unadj,

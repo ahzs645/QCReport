@@ -14,6 +14,10 @@ import type {
   ReportMatrixRow,
   SampleLite,
 } from "qcreport";
+// The preset constants come from the light, engine-free subpath.
+import type { PresetBundle, QcCriteria } from "qcreport/presets";
+
+export type { PresetBundle, QcCriteria };
 
 export type {
   AdjUnadjRow,
@@ -39,4 +43,10 @@ export function ControlChartSvg(props: {
   showLine?: boolean;
   selected: number | null;
   onSelect: (id: number) => void;
+}): ReactElement | null;
+export function PresetsReference(props: {
+  /** The `qcreport/presets` module namespace (`import * as presets from "qcreport/presets"`). */
+  presets: PresetBundle;
+  /** Live criteria parsed off a loaded workbook; defaults to presets.DEFAULT_QC_CRITERIA. */
+  criteria?: QcCriteria;
 }): ReactElement | null;

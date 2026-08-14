@@ -27,6 +27,13 @@ const EXPECTED_EXPORTS = [
   "dilutionFactor", "baseSampleId", "isOverRangeValue",
   // control charts
   "controlStats", "controlLimits", "pointStatus", "rpdFromAccepted", "performance", "parseControlChartRawData",
+  // .esws explorer
+  "extractCalibration", "extractQc", "extractSolutionDetail", "extractRunInfo", "extractSpectra",
+  "extractDefinedConcentrations", "extractQcDefinitions",
+  // run diagnostics
+  "SOLUTION_TYPE", "WEIGHTINGS", "DEFAULT_WEIGHTING", "DEFAULT_DIAGNOSTIC_RULES", "RULE_INFO",
+  "isQcCheckRow", "isSampleRow", "calibrationBlocks", "blockStandards", "blockQcChecks",
+  "expectedFromLabel", "diagnoseAnalyte", "screenRun", "whatIfSubsets",
 ];
 
 describe("engine barrel", () => {

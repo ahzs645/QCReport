@@ -51,6 +51,16 @@ export interface BatchAnalysis {
   prep: { hasHotBlock: boolean; hasLabels: boolean; entries: unknown[]; warnings: unknown[] };
   reportableAnalytes: string[];
   resultsHeaderRefs: Record<string, string>;
+  /**
+   * Inputs for the run diagnostics (screenRun / diagnoseAnalyte / whatIfSubsets),
+   * or null when the raw run was a Concentration .xlsx rather than a .esws — only
+   * the .esws carries the calibration standards and QC acceptance limits.
+   */
+  diagnostics: {
+    extract: EswsExtract;
+    defined: { concFor(standardName: string, element: string): number | null } | null;
+    qcDefs: Map<string, unknown> | null;
+  } | null;
   // Internals retained for the Excel-regen download helpers.
   _conc: unknown;
   _unadj: unknown;
@@ -138,9 +148,18 @@ export function roundSignificant(value: number, sig?: number): number;
 export function roundDecimals(value: number, decimals?: number): number;
 export function valuesMatch(computed: unknown, cached: unknown, tolerance?: number): boolean;
 
-// Quality-check engine.
-export const DEFAULT_QC_CRITERIA: Readonly<Record<string, unknown>>;
-export function parseQcCriteria(wb: Workbook): Record<string, unknown> | null;
+// Quality-check engine. The criteria shape is defined once in ./presets.d.ts
+// (the light "qcreport/presets" subpath) and re-exported here.
+export type {
+  AcceptanceRange,
+  ElementOverride,
+  QcCriteria,
+  RangeInfo,
+  RangeKey,
+  TrueValueKey,
+} from "./presets.js";
+export { DEFAULT_QC_CRITERIA } from "./presets.js";
+export function parseQcCriteria(wb: Workbook): import("./presets.js").QcCriteria | null;
 export function runQcCheck(qcModel: unknown, rawUnadjusted: ParsedContract, criteria: unknown): QcResult;
 
 // ---- QC view model (the data contract for the qcreport/ui components) --------
@@ -292,10 +311,251 @@ export function buildSeries(
   elementLabel: string,
   opts?: { from?: Date | string | null; to?: Date | string | null; extraPoints?: Array<{ file: string; date: Date | string | null; value: number }> },
 ): ControlSeries;
-export const CONTROL_CHART_INFO: Readonly<Record<string, unknown>>;
+export { CONTROL_CHART_INFO } from "./presets.js";
+
+// ---- Run diagnostics (CCV bracketing + calibration working range) ----------
+
+/** A solution's role, as ICP Expert stores it. SAMPLE is the catch-all. */
+export const SOLUTION_TYPE: Readonly<{ SAMPLE: 1; BLANK: 2; STANDARD: 3; QC: 6 }>;
+
+/** Curve weightings offered for the what-if refit. */
+export const WEIGHTINGS: Readonly<Record<"1/x" | "1/x^2" | "none", (p: { conc: number; intensity: number }) => number>>;
+export type WeightingKey = keyof typeof WEIGHTINGS;
+export const DEFAULT_WEIGHTING: WeightingKey;
+
+/** Toggleable interpretation rules. */
+export interface DiagnosticRules {
+  /** A sample must sit between two passing checks of a tier to be covered by it. */
+  bracketCcv: boolean;
+  /** A sample with no check after it is left un-bracketed. */
+  requireClosingCcv: boolean;
+  /** A result below the reporting floor stays reportable despite a failed bracket. */
+  belowFloorExempt: boolean;
+  /** Prefer the least-diluted reading that is in range. */
+  preferLeastDiluted: boolean;
+  /** An over-range reading may be answered by a dilution of the same sample. */
+  dilutionRescue: boolean;
+  /** A reading below the lowest check level that passed is flagged as un-certified. */
+  tierFloorFromChecks: boolean;
+}
+export const DEFAULT_DIAGNOSTIC_RULES: Readonly<DiagnosticRules>;
+/** One-line explanation per rule, for the UI that toggles them. */
+export const RULE_INFO: Readonly<Record<keyof DiagnosticRules, string>>;
+
+/** A block of the run governed by one calibration. */
+export interface CalibrationBlock {
+  index: number;
+  /** Indices into the runs array; `end` is exclusive. */
+  start: number;
+  end: number;
+  standardRows: number[];
+}
+
+/** One calibration standard as measured in a block. */
+export interface StandardPoint {
+  row: number;
+  label: string;
+  conc: number;
+  intensity: number;
+  /** False when the analyst has dropped this point from the curve. */
+  included: boolean;
+  /** The concentration this point's intensity implies under the current fit. */
+  backCalc: number | null;
+  /** backCalc vs the defined concentration, as a percentage. */
+  residualPct: number | null;
+}
+
+export interface CurveFit {
+  slope: number;
+  intercept: number;
+  r2: number;
+  n: number;
+}
+
+/** A periodic drift check (a CCV or low-level check) evaluated for one analyte. */
+export interface QcCheckPoint {
+  row: number;
+  label: string;
+  /** The level this check runs at — checks at the same level bracket each other. */
+  tier: number;
+  expected: number;
+  measured: number;
+  intensity: number | null;
+  recovery: number | null;
+  lower: number;
+  upper: number;
+  status: "pass" | "fail" | "na";
+  /** Whether the acceptance window came from the method or from the label. */
+  source: "method" | "label";
+}
+
+export interface DiagnosedBlock extends CalibrationBlock {
+  standards: StandardPoint[];
+  fit: CurveFit | null;
+  /** Lowest / highest retained standard — the curve's working range. */
+  floor: number | null;
+  ceiling: number | null;
+  qc: QcCheckPoint[];
+}
+
+/** How one reading of one sample fared. */
+export type ReadingStatus = "ok" | "below-floor" | "below-certified" | "over-range" | "qc-fail";
+
+export interface SampleReading {
+  row: number;
+  label: string;
+  dilutionFactor: number;
+  unadjusted: number;
+  adjusted: number;
+  intensity: number | null;
+  rsd: number | null;
+  blockIndex: number | null;
+  brackets: Array<{
+    tier: number | string;
+    covered: boolean;
+    reason: string | null;
+    before: { row: number; label: string; status: string; recovery: number | null } | null;
+    after: { row: number; label: string; status: string; recovery: number | null } | null;
+  }>;
+  /** True when a bracketing tier covers this reading in time. */
+  timeCovered: boolean;
+  /** The concentration span the block's checks certify. */
+  certified: { low: number | null; high: number } | null;
+  overRange: boolean;
+  belowFloor: boolean;
+  floor: number | null;
+  ceiling: number | null;
+  status: ReadingStatus;
+  reasons: string[];
+}
+
+/** What to do with a sample: report one of its readings, or re-run it. */
+export type SampleVerdict =
+  | "report"
+  | "report-below-limit"
+  | "report-uncertified"
+  | "rerun-dilute"
+  | "rerun-qc"
+  | "rerun";
+
+export interface DiagnosedSample {
+  /** The sample id with any dilution suffix removed — groups a sample with its dilutions. */
+  base: string;
+  runs: SampleReading[];
+  chosen: SampleReading | null;
+  verdict: SampleVerdict;
+  reasons: string[];
+}
+
+export interface DiagnosisSummary {
+  qcPass: number;
+  qcFail: number;
+  report: number;
+  reportBelowLimit: number;
+  reportUncertified: number;
+  rerun: number;
+  samples: number;
+}
+
+export interface AnalyteDiagnosis {
+  analyte: { key: string; rawLabel: string; element: string; wavelength: number; calMax: number | null };
+  weighting: WeightingKey;
+  rules: DiagnosticRules;
+  blocks: DiagnosedBlock[];
+  samples: DiagnosedSample[];
+  summary: DiagnosisSummary;
+}
+
+export interface DiagnoseOptions {
+  /** extractQcDefinitions() output — the method's own acceptance limits. */
+  qcDefs?: Map<string, unknown>;
+  /** extractDefinedConcentrations() output. */
+  defined?: { concFor(standardName: string, element: string): number | null };
+  /** Fallback % recovery window when the method defines none. */
+  defaultWindow?: { lower: number; upper: number };
+  rules?: Partial<DiagnosticRules>;
+  weighting?: WeightingKey;
+  /** Standards the analyst has dropped from the curve, by run index. */
+  excludedStandardRows?: Set<number> | number[];
+  /** Reporting limit in solution units; defaults to the curve's floor. */
+  reportingLimit?: number | null;
+}
+
+/** The extractEsws() output these functions read. */
+export interface EswsExtract {
+  analytes: Array<{ key: string; rawLabel: string; element: string; wavelength: number; calMax?: number | null }>;
+  runs: Array<Record<string, unknown>>;
+}
+
+export function isQcCheckRow(run: Record<string, unknown>): boolean;
+export function isSampleRow(run: Record<string, unknown>): boolean;
+export function calibrationBlocks(runs: EswsExtract["runs"]): CalibrationBlock[];
+export function blockStandards(
+  runs: EswsExtract["runs"],
+  block: CalibrationBlock,
+  analyte: { key: string; element: string },
+  defined?: DiagnoseOptions["defined"],
+): Array<{ row: number; label: string; conc: number; intensity: number }>;
+export function blockQcChecks(
+  runs: EswsExtract["runs"],
+  block: CalibrationBlock,
+  analyte: { key: string },
+  opts: { qcDefs?: Map<string, unknown>; defaultWindow: { lower: number; upper: number } },
+): QcCheckPoint[];
+/** Expected concentration encoded in a QC label, in mg/L ("CCV 500ppb" → 0.5). */
+export function expectedFromLabel(label: string): number | null;
+export function diagnoseAnalyte(extract: EswsExtract, analyteKey: string, options?: DiagnoseOptions): AnalyteDiagnosis;
+
+/** One row of the screening pass — the "what should I look at" table. */
+export interface ScreenRow extends DiagnosisSummary {
+  key: string;
+  rawLabel: string;
+  element: string;
+  /** The recovery furthest from 100% across the run. */
+  worstRecovery: number | null;
+  /** No periodic check failed anywhere in the run. */
+  qcClean: boolean;
+  /** Every check passed and every sample landed — nothing to do here. */
+  settled: boolean;
+}
+export function screenRun(extract: EswsExtract, options?: DiagnoseOptions & { analyteKeys?: Iterable<string> }): ScreenRow[];
+
+/** A pre-trialled standard subset and what it would buy. */
+export interface WhatIfOption extends DiagnosisSummary {
+  dropLow: number;
+  dropHigh: number;
+  excludedRows: number[];
+  floor: number | null;
+  ceiling: number | null;
+  r2: number | null;
+  isCurrent: boolean;
+  delta: { report: number; rerun: number; qcFail: number };
+}
+export function whatIfSubsets(
+  extract: EswsExtract,
+  analyteKey: string,
+  options?: DiagnoseOptions & { maxDropLow?: number; maxDropHigh?: number },
+): WhatIfOption[];
 
 // .esws explorer (operate on an already-loaded JSZip instance).
 export function extractCalibration(zip: unknown): Promise<unknown>;
+export function extractDefinedConcentrations(
+  zip: unknown,
+): Promise<{ standardNames: string[]; concFor(standardName: string, element: string): number | null }>;
+/** The method's own per-analyte QC acceptance limits, keyed by QC solution label. */
+export function extractQcDefinitions(zip: unknown): Promise<
+  Map<
+    string,
+    {
+      label: string;
+      qcType: number | null;
+      failFlag: string | null;
+      reportEquation: string | null;
+      testEquation: string | null;
+      byAnalyte: Map<string, { definedConc: number; lowerLimit: number; upperLimit: number; difference: number | null; active: boolean }>;
+    }
+  >
+>;
 export function extractQc(zip: unknown, opts?: { reportableKeys?: unknown }): Promise<unknown>;
 export function extractSolutionDetail(zip: unknown, partName: string): Promise<unknown>;
 export function extractRunInfo(zip: unknown): Promise<unknown>;

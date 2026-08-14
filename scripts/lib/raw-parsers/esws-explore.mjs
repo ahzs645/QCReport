@@ -93,6 +93,124 @@ export async function extractCalibration(zip) {
   return out;
 }
 
+// ── Defined standard concentrations ────────────────────────────────────────
+
+/**
+ * The method's defined standard concentrations, as a lookup by standard name +
+ * element. This is the same table extractCalibration() reads, exposed on its own
+ * so a caller can rebuild a calibration curve per calibration block (a run that
+ * recalibrates has several, and pooling them is meaningless).
+ *
+ * @returns {Promise<{ standardNames: string[], concFor: (standardName: string, element: string) => number|null }>}
+ */
+export async function extractDefinedConcentrations(zip) {
+  // Element order (Method/Standards) → index used by the defined-conc table.
+  const stdGraph = await readPart(zip, "Method/Standards");
+  const elIndex = new Map();
+  if (stdGraph) {
+    let i = 0;
+    for (const el of root(stdGraph)) {
+      const name = member(el, "ElementName");
+      if (name != null) elIndex.set(String(name), i++);
+    }
+  }
+
+  // Standard solutions in definition order.
+  const ssGraph = await readPart(zip, "Method/StandardSolutionDefinitions");
+  const stdIndexByName = new Map();
+  const standardNames = [];
+  if (ssGraph) {
+    root(ssGraph).forEach((o, i) => {
+      const name = String(member(o, "Name"));
+      stdIndexByName.set(name, i);
+      standardNames[i] = name;
+    });
+  }
+
+  const dcGraph = await readPart(zip, "Method/DefinedConAndMulticalRestrict_1");
+  const defConc = new Map();
+  if (dcGraph) {
+    for (const o of dcGraph.objects.values()) {
+      if (!endsWith(o, "StandardSolutionXElementData2DefinedConc")) continue;
+      defConc.set(`${member(o, "StandardIndex")}|${member(o, "ElementDataIndex")}`, member(o, "DefinedConc"));
+    }
+  }
+
+  return {
+    standardNames: standardNames.filter(Boolean),
+    concFor(standardName, element) {
+      const si = stdIndexByName.get(String(standardName));
+      const ei = elIndex.get(String(element));
+      if (si == null || ei == null) return null;
+      const value = defConc.get(`${si}|${ei}`);
+      return value == null ? null : value;
+    },
+  };
+}
+
+// ── QC acceptance criteria (as configured on the instrument) ────────────────
+
+/** "Se (196.026)" → { element: "Se", wavelength: 196.026 }; null if unparseable. */
+function parseQcElement(text) {
+  const m = String(text ?? "").match(/^\s*([A-Za-z]+)\s*\(\s*([\d.]+)\s*\)\s*$/);
+  return m ? { element: m[1], wavelength: Number(m[2]) } : null;
+}
+
+/**
+ * The QC acceptance limits the method itself carries (Method/QCSolutionDefinitions):
+ * per QC solution label, per analyte line, the defined concentration and the
+ * lower/upper % recovery limits the operator configured on the instrument.
+ *
+ * These beat inferring an expected concentration from the label text ("CCV 500ppb"),
+ * and they are per-analyte — the same CCV can hold different limits per element.
+ *
+ * Keyed by the analyte `key` (normalised "s 180.669 nm") by matching element symbol
+ * + wavelength, because the QC table names the bare element while an analyte's own
+ * label may carry a plasma-view suffix ("Ba (455.403)" vs "Ba-A 455.403 nm").
+ *
+ * @returns {Promise<Map<string, { label, qcType, failFlag, reportEquation, testEquation, byAnalyte: Map<string, { definedConc, lowerLimit, upperLimit, difference, active }> }>>}
+ */
+export async function extractQcDefinitions(zip) {
+  const graph = await readPart(zip, "Method/QCSolutionDefinitions");
+  const out = new Map();
+  if (!graph) return out;
+
+  const { analytes } = await readAnalytes(zip);
+  // element symbol + wavelength (3dp) → analyte key.
+  const byLine = new Map();
+  for (const a of analytes) byLine.set(`${a.element}|${Number(a.wavelength).toFixed(3)}`, a.key);
+
+  for (const o of graph.objects.values()) {
+    if (!endsWith(o, "QCSolutionDataType")) continue;
+    const label = String(member(o, "Label") ?? "").trim();
+    if (!label) continue;
+    const byAnalyte = new Map();
+    for (const tv of member(o, "TestValues") || []) {
+      if (!tv || !tv.members) continue;
+      const parsed = parseQcElement(member(tv, "Element"));
+      if (!parsed) continue;
+      const key = byLine.get(`${parsed.element}|${parsed.wavelength.toFixed(3)}`);
+      if (!key) continue;
+      byAnalyte.set(key, {
+        definedConc: member(tv, "DefinedConc"),
+        lowerLimit: member(tv, "LowerLimit"),
+        upperLimit: member(tv, "UpperLimit"),
+        difference: member(tv, "Difference"),
+        active: member(tv, "Active") !== false,
+      });
+    }
+    out.set(label, {
+      label,
+      qcType: member(member(o, "QCSolutionType"), "value__"),
+      failFlag: member(o, "FailFlag"),
+      reportEquation: member(o, "ReportEquation"),
+      testEquation: member(o, "TestEquation"),
+      byAnalyte,
+    });
+  }
+  return out;
+}
+
 // ── QC ────────────────────────────────────────────────────────────────────
 
 // SolutionType enum values observed: 1 Rinse, 2 Standard/Blank, 6 CCV/QC.

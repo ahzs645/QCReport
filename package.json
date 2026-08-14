@@ -11,6 +11,10 @@
       "default": "./engine/index.mjs"
     },
     "./assets": "./engine/assets.mjs",
+    "./presets": {
+      "types": "./engine/presets.d.ts",
+      "default": "./engine/presets.mjs"
+    },
     "./ui": {
       "types": "./ui/index.d.ts",
       "default": "./ui/index.mjs"
@@ -19,6 +23,7 @@
     "./templates/*": "./templates/*",
     "./package.json": "./package.json"
   },
+  "sideEffects": ["**/*.css"],
   "files": [
     "engine",
     "scripts/lib",

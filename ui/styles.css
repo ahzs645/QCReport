@@ -337,6 +337,77 @@
   box-shadow: inset 2px 0 0 var(--qc-accent);
 }
 
+/* ---- presets / reference page ---- */
+.qcreport-ui .sub {
+  color: var(--qc-muted);
+  margin: 0 0 16px;
+  max-width: 70ch;
+}
+.qcreport-ui .presets section {
+  margin: 22px 0;
+}
+.qcreport-ui .presets h2 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  color: var(--qc-strong);
+}
+.qcreport-ui .presets h3 {
+  margin: 14px 0 6px;
+  font-size: 0.85rem;
+  color: var(--qc-strong);
+}
+.qcreport-ui .presets code {
+  background: var(--qc-section-bg);
+  border-radius: var(--qc-radius-sm);
+  padding: 1px 5px;
+  font-family: var(--qc-mono);
+  font-size: 0.78rem;
+}
+.qcreport-ui .formula {
+  font-family: var(--qc-mono);
+  font-size: 0.8rem;
+}
+.qcreport-ui .preset-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--qc-card);
+  font-size: 0.8rem;
+}
+.qcreport-ui .preset-table th,
+.qcreport-ui .preset-table td {
+  border: 1px solid var(--qc-border);
+  padding: 5px 9px;
+  text-align: left;
+  vertical-align: top;
+  color: var(--qc-text);
+}
+.qcreport-ui .preset-table th {
+  background: var(--qc-section-bg);
+  color: var(--qc-strong);
+  font-weight: 600;
+}
+.qcreport-ui .presets .two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.qcreport-ui ul.kv {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.qcreport-ui ul.kv li {
+  display: flex;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px dotted var(--qc-border);
+}
+.qcreport-ui ul.kv li span {
+  flex: 0 0 130px;
+  color: var(--qc-muted);
+}
+
 /* ---- rack / prep layout ---- */
 .qcreport-ui .rack-grid {
   display: flex;

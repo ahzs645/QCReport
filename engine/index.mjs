@@ -67,4 +67,25 @@ export {
   extractSolutionDetail,
   extractRunInfo,
   extractSpectra,
+  extractDefinedConcentrations,
+  extractQcDefinitions,
 } from "../scripts/lib/raw-parsers/esws-explore.mjs";
+
+// Run diagnostics — CCV bracketing, calibration working range, and the
+// per-sample report/re-run verdicts derived from them.
+export {
+  SOLUTION_TYPE,
+  WEIGHTINGS,
+  DEFAULT_WEIGHTING,
+  DEFAULT_DIAGNOSTIC_RULES,
+  RULE_INFO,
+  isQcCheckRow,
+  isSampleRow,
+  calibrationBlocks,
+  blockStandards,
+  blockQcChecks,
+  expectedFromLabel,
+  diagnoseAnalyte,
+  screenRun,
+  whatIfSubsets,
+} from "../scripts/lib/qc-diagnostics.mjs";

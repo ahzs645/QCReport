@@ -9,6 +9,12 @@
 //   import "qcreport/ui/styles.css";   // class styles, themeable via --qc-* variables
 //
 // Theme by overriding the --qc-* custom properties on a wrapping element.
+//
+// PresetsReference renders the constants the calculations use; feed it the light,
+// engine-free "qcreport/presets" subpath (never the barrel):
+//
+//   import * as presets from "qcreport/presets";
+//   <div className="qcreport-ui"><PresetsReference presets={presets} /></div>
 
 export { QcPanel } from "./QcPanel.jsx";
 export { ResultsPreview } from "./ResultsPreview.jsx";
@@ -16,3 +22,4 @@ export { AdjUnadjPanel } from "./AdjUnadjPanel.jsx";
 export { RackView } from "./RackView.jsx";
 export { ControlChart } from "./ControlChart.jsx";
 export { ControlChartSvg } from "./ControlChartSvg.jsx";
+export { PresetsReference } from "./PresetsReference.jsx";
