@@ -51,6 +51,16 @@ export interface BatchAnalysis {
   prep: { hasHotBlock: boolean; hasLabels: boolean; entries: unknown[]; warnings: unknown[] };
   reportableAnalytes: string[];
   resultsHeaderRefs: Record<string, string>;
+  /**
+   * Inputs for the run diagnostics (screenRun / diagnoseAnalyte / whatIfSubsets),
+   * or null when the raw run was a Concentration .xlsx rather than a .esws — only
+   * the .esws carries the calibration standards and QC acceptance limits.
+   */
+  diagnostics: {
+    extract: EswsExtract;
+    defined: { concFor(standardName: string, element: string): number | null } | null;
+    qcDefs: Map<string, unknown> | null;
+  } | null;
   // Internals retained for the Excel-regen download helpers.
   _conc: unknown;
   _unadj: unknown;

@@ -74,9 +74,20 @@ export const SOLUTION_TYPE = Object.freeze({ SAMPLE: 1, BLANK: 2, STANDARD: 3, Q
  * standards' own back-calculation residuals (returned per point) show the analyst
  * how closely the model tracks their curve before they trust its verdict.
  */
+/**
+ * The blank's weight under a 1/x-family weighting, where 1/x is undefined at zero.
+ *
+ * It anchors rather than drops: ICP Expert blank-corrects the intensities before
+ * fitting, which is equivalent to pinning the curve at the blank, and the blank is
+ * the one point that fixes the intercept. Measured against this lab's runs,
+ * dropping it instead lands further from the instrument (median 0.55% / p90 4.0%
+ * vs 0.42% / 2.7%).
+ */
+const BLANK_ANCHOR_WEIGHT = 1e6;
+
 export const WEIGHTINGS = Object.freeze({
-  "1/x": (p) => (p.conc > 0 ? 1 / p.conc : 0),
-  "1/x^2": (p) => (p.conc > 0 ? 1 / (p.conc * p.conc) : 0),
+  "1/x": (p) => (p.conc > 0 ? 1 / p.conc : BLANK_ANCHOR_WEIGHT),
+  "1/x^2": (p) => (p.conc > 0 ? 1 / (p.conc * p.conc) : BLANK_ANCHOR_WEIGHT),
   none: () => 1,
 });
 
