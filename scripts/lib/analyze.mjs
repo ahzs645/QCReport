@@ -77,12 +77,18 @@ export async function loadDrops(files) {
       const zip = await JSZip.loadAsync(f.buffer);
       if (isEswsZip(zip)) {
         // The two method tables are read here, while the zip is open, because the
-        // run diagnostics need them and nothing else keeps the zip alive. Both are
-        // small parts, and only a .esws carries them — a Concentration .xlsx export
-        // has no calibration standards or QC acceptance limits in it, which is why
-        // the diagnostics are .esws-only.
+        // run diagnostics need them. Both are small parts, and only a .esws carries
+        // them — a Concentration .xlsx export has no calibration standards or QC
+        // acceptance limits in it, which is why the diagnostics are .esws-only.
+        //
+        // The archive itself is carried on rather than dropped: the emission spectra
+        // and the replicate readings are one part per solution — 84 solutions × 112
+        // lines in a routine run — far too much to decode up front for data a viewer
+        // reads a dozen cells of, so they are pulled per cell and that needs the zip
+        // still open.
         rawEsws = {
           name: f.name,
+          zip,
           extract: await extractEsws(zip),
           defined: await extractDefinedConcentrations(zip),
           qcDefs: await extractQcDefinitions(zip),
@@ -117,7 +123,7 @@ export async function analyzeFiles({ files, loadDefaultResultsWb, loadDefaultQcW
  *
  * @param {object}   args
  * @param {Array<{name:string, wb:object}>} [args.drops]   loaded non-esws workbooks
- * @param {{name:string, extract:object}|null} [args.rawEsws]  parsed ICP Expert .esws
+ * @param {{name:string, extract:object, zip?:object}|null} [args.rawEsws]  parsed ICP Expert .esws
  * @param {() => Promise<object>|object} args.loadDefaultResultsWb  loader for the blank RESULTS template
  * @param {() => Promise<object>|object} args.loadDefaultQcWb       loader for the blank QC template
  * @returns {Promise<object>} the analysis the UI/consumer needs (plus `_`-prefixed
@@ -215,12 +221,30 @@ export async function analyzeBatch({ drops = [], rawEsws = null, loadDefaultResu
       entries: [...identity.values()],
       warnings: enriched.warnings,
     },
+    // What the ingest made of the raw run. Previously only its cells were kept, so an
+    // over-range value that needed a human — or one a dilution had already answered —
+    // had no way to reach the interface or the export warnings.
+    ingest: {
+      matchedSamples: ingest.matchedSamples,
+      unmatchedSamples: ingest.unmatchedSamples,
+      overRangeResolved: ingest.overRangeResolved,
+      overRangeFlagged: ingest.overRangeFlagged,
+      overRangeResolutions: ingest.overRangeResolutions,
+      warnings: ingest.warnings,
+    },
     reportableAnalytes: [...reportableAnalyteKeys(spec)],
     resultsHeaderRefs: findHeaderFields(specWb, "ICPOES RESULTS"),
     // Everything screenRun()/diagnoseAnalyte() need, or null when the raw run came
     // from a Concentration .xlsx (which carries no standards or acceptance limits).
     diagnostics: rawEsws
-      ? { extract: rawEsws.extract, defined: rawEsws.defined ?? null, qcDefs: rawEsws.qcDefs ?? null }
+      ? {
+          extract: rawEsws.extract,
+          defined: rawEsws.defined ?? null,
+          qcDefs: rawEsws.qcDefs ?? null,
+          // Present only when the caller passed the open archive; the per-cell spectra
+          // and replicate readings are unreachable without it.
+          zip: rawEsws.zip ?? null,
+        }
       : null,
     // retained for downloads
     _conc: conc,

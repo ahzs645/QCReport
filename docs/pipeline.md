@@ -28,6 +28,25 @@ in code with **100% agreement** — see "Validation"):
   blank            -> "NO DATA"
   contains "Uncal" -> "Uncal"            (ICPOES only)
   contains "o"/"####" -> "over-range"    (ICPOES only)
+
+### Over-range values and dilution reruns
+
+An over-range straight run is not automatically a re-run: the same sample is usually
+also on the tray at 10× or 100×. `ingestInstrument` substitutes the least-diluted
+rerun that can answer, under two rules:
+
+- The rerun's `Conc` is **already dilution-corrected by the instrument**, so it is used
+  as-is and never multiplied by the factor again. Verified on a real batch — calcium
+  read within 1% of its straight run at both 10× and 100×.
+- The **reporting limit scales with the dilution**, so a reading below `limit × factor`
+  is refused. Below that the analyte is not measurable at that dilution and the value
+  is noise multiplied up: in the same batch, mercury's 100× rerun came out at 229 µg/L
+  against a straight-run 1.6, purely from scaling a reading under the 7 µg/L limit.
+
+What could not be answered is returned in `analysis.ingest.overRangeFlagged` with an
+`over_range_needs_review` warning; what was answered is listed in
+`overRangeResolutions` with the dilution factor used. Pass `--no-resolve-dilutions`
+to leave every over-range value flagged instead.
   value < DL (row 63) or non-numeric -> "<DL" label (row 64)
   otherwise        -> the value
   ```
@@ -65,7 +84,7 @@ npm run compute:report -- --source "<…RESULTS…OES.xlsx>"
 npm run ingest:raw -- --roster "<…RESULTS…OES.xlsx>" --source-root "<…/<sample> RW>" \
                       [--icpoes-conc <OES.xlsx>] [--ic <IC.xls>] \
                       [--qc "<…QC_BatchA…OES.xlsx>"] \
-                      [--validate "<…RESULTS…OES.xlsx>"] [--resolve-dilutions]
+                      [--validate "<…RESULTS…OES.xlsx>"] [--no-resolve-dilutions]
 
 # Control-chart QA report (Shewhart, Digest LFB) over an optional date window
 npm run analyze:control-chart -- --source "<…ControlChart…xlsx>" [--from YYYY-MM-DD] [--to YYYY-MM-DD]
@@ -107,8 +126,9 @@ Run on `2026NALS02604 RW` and `2026NALS02621 RW`:
 - **Raw ingest (2a, ICPOES):** **8/8 client samples matched**; **97.6%** of the
   analyst's pasted cells reconstructed automatically from the raw `Conc` file
   (analytes matched by label, samples by NALS id). The remaining ~2.4% are
-  over-range cells where the analyst manually substitutes a dilution rerun — these
-  are flagged for review (or auto-substituted with `--resolve-dilutions`).
+  over-range cells where the analyst used to substitute a dilution rerun by hand;
+  these are now substituted automatically (see below), and only the ones no usable
+  dilution can answer are flagged for review.
 - **Raw ingest (2a, IC):** anions matched by name, samples by NALS # + descriptive
   name; CDet detector primary, UV fallback for `n.a.` cells. The reported sample
   (Kitchen) reconstructs **7/7 anions exactly**. Note: a shared IC batch covers
@@ -190,7 +210,7 @@ scripts/lib/
 | control-chart utility (Shewhart, date-windowed) | ✅ done — `analyze:control-chart` CLI + app "Control Charts" tab; stats match workbook exactly |
 | QA reporting + vitest + docs | ✅ done — cross-checks + validation + out-of-control report; 28 tests |
 | 2b Word report generation | ⛔ next — fill a .docx template per client sample |
-| over-range dilution policy | ⚠️ flagged for review; opt-in auto-substitution |
+| over-range dilution policy | ✅ automatic, limit-guarded; verified 8/8 against a real batch |
 | per-report instrument scope | ⚠️ tool fills all available raw data; "extra" cells flagged |
 
 ## Notes & limits

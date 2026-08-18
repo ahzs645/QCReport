@@ -64,6 +64,7 @@ export {
 export {
   extractCalibration,
   extractQc,
+  qcRecoveryStatus,
   extractSolutionDetail,
   extractRunInfo,
   extractSpectra,

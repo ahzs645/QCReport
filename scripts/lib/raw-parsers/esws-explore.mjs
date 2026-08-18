@@ -229,9 +229,33 @@ function expectedFromName(name) {
  * recovery (where an expected concentration can be inferred from the label).
  * @returns {Promise<{ analytes, rows }>}
  */
+/**
+ * Is this QC cell inside the window it should be judged by?
+ *
+ * The method states a window per solution and per analyte; 90–110 is only the fallback for
+ * a worksheet that sets none. On a real run this is not cosmetic — judging every cell by
+ * 90–110 flipped 32 of 1219 verdicts to failures the method does not consider failures,
+ * which is the kind of false alarm that teaches people to ignore the colour.
+ *
+ * @param {{recovery: number|null, lower?: number|null, upper?: number|null}} cell
+ * @returns {"pass"|"fail"|"n/a"}
+ */
+export function qcRecoveryStatus(cell) {
+  const recovery = cell?.recovery;
+  if (recovery == null || !Number.isFinite(recovery)) return "n/a";
+  const lower = cell.lower ?? 90;
+  const upper = cell.upper ?? 110;
+  return recovery >= lower && recovery <= upper ? "pass" : "fail";
+}
+
 export async function extractQc(zip, { reportableKeys } = {}) {
   const { analytes, analyteById } = await readAnalytes(zip);
   const defByKey = await readDefinitions(zip);
+  // The method states, per QC solution AND per analyte, what the solution should read and
+  // how far off it may be. A single 90–110 window is a guess about all of them: this run
+  // allows 70–130 on its low-level check and 80–120 at 200 ppb, so judging every cell by
+  // 90–110 shows failures the method does not consider failures.
+  const qcDefs = await extractQcDefinitions(zip);
   const keep = reportableKeys ? new Set(reportableKeys) : null;
 
   const rows = [];
@@ -245,7 +269,8 @@ export async function extractQc(zip, { reportableKeys } = {}) {
     const solType = member(member(sol, "Solutiontype"), "value__");
     const isQc = QC_NAME.test(label) || solType === 6;
     if (!isQc || label === "") continue;
-    const expected = expectedFromName(label);
+    const labelled = expectedFromName(label);
+    const definition = qcDefs.get(label);
     const values = {};
     for (const m of member(sol, "Measurements") || []) {
       if (!m || !m.members) continue;
@@ -253,9 +278,19 @@ export async function extractQc(zip, { reportableKeys } = {}) {
       if (!a || (keep && !keep.has(a.key))) continue;
       const conc = member(member(m, "ConcentrationCalculator"), "average");
       if (conc == null) continue;
-      values[a.key] = { conc, recovery: expected ? (conc / expected) * 100 : null };
+      // The method's own defined concentration beats one inferred from the label text.
+      const method = definition?.byAnalyte?.get(a.key);
+      const target = method?.active && method.definedConc != null ? method.definedConc : labelled;
+      values[a.key] = {
+        conc,
+        recovery: target ? (conc / target) * 100 : null,
+        expected: target ?? null,
+        lower: method?.lowerLimit ?? null,
+        upper: method?.upperLimit ?? null,
+        source: method?.active && method.definedConc != null ? "method" : labelled ? "label" : "none",
+      };
     }
-    rows.push({ seq, label, solType, qcPassed: member(sol, "IsQCPassed"), expected, values });
+    rows.push({ seq, label, solType, qcPassed: member(sol, "IsQCPassed"), expected: labelled, values });
   }
   return { analytes: keep ? analytes.filter((a) => keep.has(a.key)) : analytes, rows };
 }
@@ -336,7 +371,11 @@ export async function extractSpectra(zip, solutionKey) {
     for (const a of analytes) { const d = Math.abs(a.wavelength - wl); if (d < bestD) { bestD = d; best = a; } }
     return bestD <= 0.3 ? best : null;
   };
-  const byLine = new Map(); // one spectrum per analyte line (first wins)
+  // One scan per replicate per line — the part holds all of them, in replicate order
+  // within a line. The first is kept at the top level for callers that want a single
+  // trace; `scans` carries every one, because the spread between them is the visible
+  // form of the %RSD and the instrument plots them together.
+  const byLine = new Map();
   for (const o of g.objects.values()) {
     if (!endsWith(o, "SpectrumDataType")) continue;
     const wavelengths = member(o, "wavelengths");
@@ -345,8 +384,19 @@ export async function extractSpectra(zip, solutionKey) {
     const center = wavelengths[Math.floor(wavelengths.length / 2)];
     const near = nearestLine(center);
     const key = near ? near.key : `@${center.toFixed(3)}`;
-    if (byLine.has(key)) continue;
-    byLine.set(key, { wavelengths, counts, center, peak: Math.max(...counts), nearest: near ? near.rawLabel : null, key });
+    const scan = { wavelengths, counts, peak: Math.max(...counts), floor: Math.min(...counts) };
+    const line = byLine.get(key);
+    if (line) {
+      line.scans.push(scan);
+      continue;
+    }
+    byLine.set(key, {
+      ...scan,
+      center,
+      nearest: near ? near.rawLabel : null,
+      key,
+      scans: [scan],
+    });
   }
   return [...byLine.values()].sort((a, b) => a.center - b.center);
 }

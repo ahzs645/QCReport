@@ -14,7 +14,7 @@
 // Usage:
 //   npm run ingest:raw -- --roster "<…RESULTS…OES.xlsx>" --source-root "<…/<sample> RW>"
 //                        [--icpoes-conc <file.xlsx>] [--ic <file.xls>]
-//                        [--validate "<…RESULTS…OES.xlsx>"] [--resolve-dilutions]
+//                        [--validate "<…RESULTS…OES.xlsx>"] [--no-resolve-dilutions]
 
 import fs from "node:fs";
 import path from "node:path";
@@ -101,7 +101,7 @@ function validateSheet(wb, cells, sheetName) {
 async function main() {
   const args = parseArgs(process.argv.slice(2), {
     aliases: { o: "output" },
-    booleans: ["help", "resolve-dilutions"],
+    booleans: ["help", "no-resolve-dilutions"],
     defaults: { output: path.join("out", "ingest") },
   });
   if (args.help) {
@@ -112,7 +112,9 @@ async function main() {
   const rosterPath = requireArg(args, "roster", "RESULTS workbook providing the client roster + layout");
   const sourceRoot = args["source-root"] ? path.resolve(args["source-root"]) : null;
   const outDir = path.resolve(ROOT, args.output);
-  const resolveDilutions = Boolean(args["resolve-dilutions"]);
+  // On by default: an over-range straight run that has a usable dilution on the same tray
+  // is answered by it rather than left as "over-range" for someone to paste in by hand.
+  const resolveDilutions = !args["no-resolve-dilutions"];
 
   console.log(`Roster + layout from ${path.basename(rosterPath)}`);
   const rosterWb = await openWorkbook(rosterPath);

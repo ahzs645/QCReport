@@ -52,6 +52,19 @@ export interface BatchAnalysis {
   reportableAnalytes: string[];
   resultsHeaderRefs: Record<string, string>;
   /**
+   * What the ingest made of the raw run: which over-range readings a dilution rerun
+   * answered, and which still need a person. A substitution the tool made on the
+   * analyst's behalf has to be reportable, so the host can say so.
+   */
+  ingest: {
+    matchedSamples: number;
+    unmatchedSamples: string[];
+    overRangeResolved: number;
+    overRangeFlagged: number;
+    overRangeResolutions: Array<{ sheet: string; sample: string; analyte: string; factor: number; value: number }>;
+    warnings: Array<{ kind: string; sheet?: string; sample?: string; analyte?: string; value?: unknown }>;
+  };
+  /**
    * Inputs for the run diagnostics (screenRun / diagnoseAnalyte / whatIfSubsets),
    * or null when the raw run was a Concentration .xlsx rather than a .esws — only
    * the .esws carries the calibration standards and QC acceptance limits.
@@ -60,6 +73,12 @@ export interface BatchAnalysis {
     extract: EswsExtract;
     defined: { concFor(standardName: string, element: string): number | null } | null;
     qcDefs: Map<string, unknown> | null;
+    /**
+     * The still-open archive, when the caller supplied one. `extractSpectra` and
+     * `extractSolutionDetail` read one part per solution on demand and need it; null
+     * when the analysis came from parsed input with no archive behind it.
+     */
+    zip?: unknown;
   } | null;
   // Internals retained for the Excel-regen download helpers.
   _conc: unknown;
@@ -557,6 +576,21 @@ export function extractQcDefinitions(zip: unknown): Promise<
   >
 >;
 export function extractQc(zip: unknown, opts?: { reportableKeys?: unknown }): Promise<unknown>;
+/** Whether a QC cell sits inside the window the method sets for it (90–110 only as fallback). */
+export function qcRecoveryStatus(cell: {
+  recovery: number | null;
+  lower?: number | null;
+  upper?: number | null;
+}): "pass" | "fail" | "n/a";
 export function extractSolutionDetail(zip: unknown, partName: string): Promise<unknown>;
 export function extractRunInfo(zip: unknown): Promise<unknown>;
+/**
+ * The emission scans recorded for one solution, one entry per analyte line.
+ *
+ * `wavelengths`/`counts` are the first replicate's scan; `scans` carries every
+ * replicate. Only the raw counts are stored — ICP Expert's dashed background-fit
+ * curve and its peak-integration marks are drawn by the instrument software and are
+ * not in the worksheet. The background *level* it subtracted is, per replicate, on
+ * `extractSolutionDetail`.
+ */
 export function extractSpectra(zip: unknown, solutionKey: string): Promise<unknown>;
