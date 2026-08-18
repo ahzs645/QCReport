@@ -584,4 +584,13 @@ export function qcRecoveryStatus(cell: {
 }): "pass" | "fail" | "n/a";
 export function extractSolutionDetail(zip: unknown, partName: string): Promise<unknown>;
 export function extractRunInfo(zip: unknown): Promise<unknown>;
+/**
+ * The emission scans recorded for one solution, one entry per analyte line.
+ *
+ * `wavelengths`/`counts` are the first replicate's scan; `scans` carries every
+ * replicate. Only the raw counts are stored — ICP Expert's dashed background-fit
+ * curve and its peak-integration marks are drawn by the instrument software and are
+ * not in the worksheet. The background *level* it subtracted is, per replicate, on
+ * `extractSolutionDetail`.
+ */
 export function extractSpectra(zip: unknown, solutionKey: string): Promise<unknown>;

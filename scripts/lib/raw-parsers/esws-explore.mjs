@@ -371,7 +371,11 @@ export async function extractSpectra(zip, solutionKey) {
     for (const a of analytes) { const d = Math.abs(a.wavelength - wl); if (d < bestD) { bestD = d; best = a; } }
     return bestD <= 0.3 ? best : null;
   };
-  const byLine = new Map(); // one spectrum per analyte line (first wins)
+  // One scan per replicate per line — the part holds all of them, in replicate order
+  // within a line. The first is kept at the top level for callers that want a single
+  // trace; `scans` carries every one, because the spread between them is the visible
+  // form of the %RSD and the instrument plots them together.
+  const byLine = new Map();
   for (const o of g.objects.values()) {
     if (!endsWith(o, "SpectrumDataType")) continue;
     const wavelengths = member(o, "wavelengths");
@@ -380,8 +384,19 @@ export async function extractSpectra(zip, solutionKey) {
     const center = wavelengths[Math.floor(wavelengths.length / 2)];
     const near = nearestLine(center);
     const key = near ? near.key : `@${center.toFixed(3)}`;
-    if (byLine.has(key)) continue;
-    byLine.set(key, { wavelengths, counts, center, peak: Math.max(...counts), nearest: near ? near.rawLabel : null, key });
+    const scan = { wavelengths, counts, peak: Math.max(...counts), floor: Math.min(...counts) };
+    const line = byLine.get(key);
+    if (line) {
+      line.scans.push(scan);
+      continue;
+    }
+    byLine.set(key, {
+      ...scan,
+      center,
+      nearest: near ? near.rawLabel : null,
+      key,
+      scans: [scan],
+    });
   }
   return [...byLine.values()].sort((a, b) => a.center - b.center);
 }
