@@ -52,6 +52,19 @@ export interface BatchAnalysis {
   reportableAnalytes: string[];
   resultsHeaderRefs: Record<string, string>;
   /**
+   * What the ingest made of the raw run: which over-range readings a dilution rerun
+   * answered, and which still need a person. A substitution the tool made on the
+   * analyst's behalf has to be reportable, so the host can say so.
+   */
+  ingest: {
+    matchedSamples: number;
+    unmatchedSamples: string[];
+    overRangeResolved: number;
+    overRangeFlagged: number;
+    overRangeResolutions: Array<{ sheet: string; sample: string; analyte: string; factor: number; value: number }>;
+    warnings: Array<{ kind: string; sheet?: string; sample?: string; analyte?: string; value?: unknown }>;
+  };
+  /**
    * Inputs for the run diagnostics (screenRun / diagnoseAnalyte / whatIfSubsets),
    * or null when the raw run was a Concentration .xlsx rather than a .esws — only
    * the .esws carries the calibration standards and QC acceptance limits.
