@@ -73,6 +73,12 @@ export interface BatchAnalysis {
     extract: EswsExtract;
     defined: { concFor(standardName: string, element: string): number | null } | null;
     qcDefs: Map<string, unknown> | null;
+    /**
+     * The still-open archive, when the caller supplied one. `extractSpectra` and
+     * `extractSolutionDetail` read one part per solution on demand and need it; null
+     * when the analysis came from parsed input with no archive behind it.
+     */
+    zip?: unknown;
   } | null;
   // Internals retained for the Excel-regen download helpers.
   _conc: unknown;

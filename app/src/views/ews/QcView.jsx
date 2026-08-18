@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { qc } from "../../core/esws.js";
-import { qcRecoveryStatus } from "qcreport";
+import { qcRecoveryStatus } from "../../../../scripts/lib/raw-parsers/esws-explore.mjs";
 
 /** Colour by the window the method sets for that solution and analyte — see qcRecoveryStatus. */
 const recClass = (cell) => {
