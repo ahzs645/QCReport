@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { qc } from "../../core/esws.js";
+import { qcRecoveryStatus } from "qcreport";
 
-const recClass = (r) => (r == null ? undefined : r >= 90 && r <= 110 ? "qc-in" : "qc-out");
+/** Colour by the window the method sets for that solution and analyte — see qcRecoveryStatus. */
+const recClass = (cell) => {
+  const status = qcRecoveryStatus(cell ?? { recovery: null });
+  return status === "n/a" ? undefined : status === "pass" ? "qc-in" : "qc-out";
+};
 
 export default function QcView({ session }) {
   const [data, setData] = useState(null);
@@ -23,9 +28,11 @@ export default function QcView({ session }) {
   return (
     <>
       <p className="sub" style={{ marginTop: 4 }}>
-        QC solutions in run order (CCV / blanks / spikes). Cells show <b>% recovery</b> vs the expected
-        concentration inferred from the label; green = 90–110%, red = outside. Reading top-to-bottom shows
-        drift across the run. “Pass” is ICP Expert’s own QC verdict.
+        QC solutions in run order (CCV / blanks / spikes). Cells show <b>% recovery</b> against the
+        concentration the method defines for that solution (falling back to the label when it defines
+        none); green is inside the method’s own window for that analyte — 90–110% only where the
+        worksheet sets nothing else — and red is outside it. Hover a cell for the window it was judged
+        by. Reading top-to-bottom shows drift across the run. “Pass” is ICP Expert’s own QC verdict.
       </p>
       <div className="cc-table-scroll">
         <table className="cc-table qc-matrix">
@@ -48,8 +55,9 @@ export default function QcView({ session }) {
                 {shown.map((a) => {
                   const v = r.values[a.key];
                   const rec = v?.recovery;
+                  const window = v && (v.lower != null || v.upper != null) ? ` — allowed ${v.lower ?? 90}–${v.upper ?? 110}%` : "";
                   return (
-                    <td key={a.key} className={recClass(rec)} title={v ? `${v.conc.toFixed(4)} mg/L` : ""}>
+                    <td key={a.key} className={recClass(v)} title={v ? `${v.conc.toFixed(4)} mg/L${window}` : ""}>
                       {rec != null ? `${rec.toFixed(0)}%` : v ? v.conc.toFixed(3) : ""}
                     </td>
                   );

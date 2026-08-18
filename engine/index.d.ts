@@ -570,6 +570,12 @@ export function extractQcDefinitions(zip: unknown): Promise<
   >
 >;
 export function extractQc(zip: unknown, opts?: { reportableKeys?: unknown }): Promise<unknown>;
+/** Whether a QC cell sits inside the window the method sets for it (90–110 only as fallback). */
+export function qcRecoveryStatus(cell: {
+  recovery: number | null;
+  lower?: number | null;
+  upper?: number | null;
+}): "pass" | "fail" | "n/a";
 export function extractSolutionDetail(zip: unknown, partName: string): Promise<unknown>;
 export function extractRunInfo(zip: unknown): Promise<unknown>;
 export function extractSpectra(zip: unknown, solutionKey: string): Promise<unknown>;
