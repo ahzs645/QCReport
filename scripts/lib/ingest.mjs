@@ -24,19 +24,25 @@ const SAMPLE_ID_COL = numberToCol(2); // B
  * @param {number} opts.inputBandStart - first input row (e.g. 18)
  * @param {(label:string)=>string} opts.analyteKey - maps a RESULTS analyte label to a parser key
  * @param {string} opts.sheetName
- * @param {boolean} [opts.resolveDilutions=false]
- * @returns {{cells, warnings, matchedSamples, unmatchedSamples, overRangeResolved, overRangeFlagged}}
+ * @param {boolean} [opts.resolveDilutions=true] - substitute a dilution rerun for an
+ *   over-range straight run (see resolveValue); pass false to leave the flag in place.
+ * @returns {{cells, warnings, matchedSamples, unmatchedSamples, overRangeResolved,
+ *   overRangeFlagged, overRangeResolutions}}
  */
 export function ingestInstrument(parsed, opts) {
-  const { samples, analytes, inputBandStart, analyteKey, sheetName, resolveDilutions = false } = opts;
+  const { samples, analytes, inputBandStart, analyteKey, sheetName, resolveDilutions = true } = opts;
   const cells = [];
   const warnings = [];
 
-  // RESULTS analyte key -> input column.
+  // RESULTS analyte key -> input column, and -> undiluted reportable limit (workbook
+  // row 63). The limit is what makes a dilution substitution safe; see resolveValue.
   const keyToCol = new Map();
+  const keyToLimit = new Map();
   for (const a of analytes) {
     const key = analyteKey(a.label);
-    if (key && !keyToCol.has(key)) keyToCol.set(key, a.inputCol);
+    if (!key) continue;
+    if (!keyToCol.has(key)) keyToCol.set(key, a.inputCol);
+    if (!keyToLimit.has(key) && Number.isFinite(a.detectionLimit)) keyToLimit.set(key, a.detectionLimit);
   }
 
   // Index undiluted raw rows by matched client sample id; collect dilution reruns.
@@ -60,18 +66,40 @@ export function ingestInstrument(parsed, opts) {
 
   let overRangeResolved = 0;
   let overRangeFlagged = 0;
+  const overRangeResolutions = [];
+
+  /**
+   * An over-range straight run is not automatically a re-run: the same sample is usually
+   * also on the tray at 10x or 100x, and if one of those landed inside the working range
+   * that reading is the answer.
+   *
+   * Two rules make the substitution safe.
+   *
+   * The diluted rerun's Conc is ALREADY dilution-corrected by the instrument, so it is
+   * used as-is and never multiplied by the factor again. (Verified against a real batch:
+   * calcium read within 1% of its straight run at both 10x and 100x.)
+   *
+   * The reporting limit scales with the dilution, so a reading below `limit x factor` is
+   * rejected. Below that the analyte is not measurable at that dilution and the value is
+   * noise multiplied up — in the same batch mercury's 100x rerun came out at 229 ug/L
+   * against a straight-run 1.6, purely from scaling a reading that was under the 7 ug/L
+   * limit. Taking the first non-over-range dilution would have reported that number.
+   *
+   * The least-diluted usable rerun wins; `dilutionsBySampleId` is sorted ascending.
+   */
   const resolveValue = (id, key, value) => {
     if (!isOverRangeValue(value)) return value;
     if (resolveDilutions) {
-      // The diluted rerun's Conc value is already dilution-corrected by the
-      // instrument, so use it directly (do NOT multiply by the factor again).
+      const limit = keyToLimit.get(key);
       for (const dil of dilutionsBySampleId.get(id) || []) {
         const dv = dil.values[key];
         const num = dv === undefined || isOverRangeValue(dv) ? null : toNumber(dv);
-        if (num !== null) {
-          overRangeResolved += 1;
-          return num;
-        }
+        if (num === null) continue;
+        const floor = Number.isFinite(limit) ? limit * (dil.factor || 1) : null;
+        if (floor !== null && Math.abs(num) < floor) continue;
+        overRangeResolved += 1;
+        overRangeResolutions.push({ sheet: sheetName, sample: id, analyte: key, factor: dil.factor, value: num });
+        return num;
       }
     }
     overRangeFlagged += 1;
@@ -110,7 +138,7 @@ export function ingestInstrument(parsed, opts) {
     warnings.push({ kind: "analyte_missing_in_raw", sheet: sheetName, analyte: key });
   }
 
-  return { cells, warnings, matchedSamples, unmatchedSamples, overRangeResolved, overRangeFlagged };
+  return { cells, warnings, matchedSamples, unmatchedSamples, overRangeResolved, overRangeFlagged, overRangeResolutions };
 }
 
 // ---- Per-instrument wrappers (each fixes the analyteKey for its layout) -------

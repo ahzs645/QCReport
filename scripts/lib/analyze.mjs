@@ -215,6 +215,17 @@ export async function analyzeBatch({ drops = [], rawEsws = null, loadDefaultResu
       entries: [...identity.values()],
       warnings: enriched.warnings,
     },
+    // What the ingest made of the raw run. Previously only its cells were kept, so an
+    // over-range value that needed a human — or one a dilution had already answered —
+    // had no way to reach the interface or the export warnings.
+    ingest: {
+      matchedSamples: ingest.matchedSamples,
+      unmatchedSamples: ingest.unmatchedSamples,
+      overRangeResolved: ingest.overRangeResolved,
+      overRangeFlagged: ingest.overRangeFlagged,
+      overRangeResolutions: ingest.overRangeResolutions,
+      warnings: ingest.warnings,
+    },
     reportableAnalytes: [...reportableAnalyteKeys(spec)],
     resultsHeaderRefs: findHeaderFields(specWb, "ICPOES RESULTS"),
     // Everything screenRun()/diagnoseAnalyte() need, or null when the raw run came
